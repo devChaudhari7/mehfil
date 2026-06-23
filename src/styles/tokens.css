@@ -1,0 +1,149 @@
+/*
+ * MEHFIL — design tokens (Phase 0)
+ * ---------------------------------
+ * Two layers:
+ *   1. Base / static spine  (:root)            — the warm palette + system tokens.
+ *   2. Per-era, medium-driven sets ([data-era]) — "The Groove": palette shifts
+ *      with the physical medium (shellac -> vinyl -> cassette -> CD).
+ *
+ * Authoritative source: docs/01-art-direction.md ("The Groove"), which supersedes
+ * brief §10. Era values are lifted verbatim from docs/concept/groove-concept.html
+ * so the Phase 4 hero can drive them unchanged.
+ *
+ * NAMING NOTE: the concept uses `--ink` as the *readable foreground on the dark
+ * stage* (a light color, varies per era). The brief's §10 `--ink` (#211A12) is the
+ * *dark ink on cream paper* — exposed here as `--paper-ink` to avoid the collision.
+ */
+
+:root {
+  /* --- Brief §10 warm spine (static; used by light/paper surfaces) --- */
+  --paper: #f3e9d2;
+  --paper-deep: #e7d8b8;
+  --paper-ink: #211a12; /* dark ink on paper (brief §10 `--ink`) */
+  --amber: #d98e2b;
+  --terracotta: #c0532e;
+  --petrol: #1e4546;
+  --valve: #f0a847; /* reserved for now-playing */
+  --rust: #9c3b26;
+
+  /* Disco / 80s neon spine (over night) */
+  --night: #1a1238;
+  --neon-magenta: #ff3d7f;
+  --neon-cyan: #00e0ff;
+
+  /* --- Era token defaults (overridden per [data-era]; never empty) --- */
+  --s1: #16241f; /* stage gradient inner stop */
+  --s2: #070f0c; /* stage gradient outer stop */
+  --disc: #0c0c0e;
+  --disc2: #1a1a1f;
+  --label: #2e6f64;
+  --label-ink: #eef3ee;
+  --accent: #e0a13a;
+  --accent2: #1e4a48;
+  --ink: #eef3ee; /* readable foreground ON the dark stage */
+  --glow: #e8c074;
+  --grain: 0.1; /* film-grain opacity (shellac loud -> CD near-silent) */
+
+  /* --- Surface-aware roles (Phase 1; AA-verified per era below) --- */
+  --btn: var(--label); /* solid-button fill */
+  --btn-ink: var(--label-ink); /* readable text ON the fill */
+  --accent-paper: var(--petrol); /* era-flavored dark accent for LIGHT paper surfaces */
+
+  /* --- System tokens (motion, shape, surface) --- */
+  --morph-dur: 1.1s; /* era-morph transition length (brief/art-direction) */
+  --ease-analog: cubic-bezier(0.7, 0, 0.2, 1); /* weighty, mechanical, never bouncy */
+  --radius-pill: 999px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --vignette: radial-gradient(
+    120% 110% at 50% 38%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+/* ---- Eras: the medium is the map (verbatim from groove-concept.html) ---- */
+
+[data-era="50s"] {
+  /* Shellac 78 · roasted sepia, candle-amber, art-deco · heavy crackle */
+  --s1: #241809;
+  --s2: #0d0805;
+  --disc: #15100a;
+  --disc2: #2a2014;
+  --label: #c9962e;
+  --label-ink: #2a1c08;
+  --accent: #d9a441;
+  --accent2: #a8761f;
+  --ink: #f3e7cf;
+  --glow: #e9b860;
+  --grain: 0.17;
+  --btn: #c9962e;
+  --btn-ink: #2a1c08; /* 6.22:1 */
+  --accent-paper: #7a4a12; /* 5.30:1 on paper-deep */
+}
+
+[data-era="60s"] {
+  /* Vinyl 33⅓ · warm walnut + petrol teal · soft surface noise */
+  --s1: #16241f;
+  --s2: #070f0c;
+  --disc: #0c0c0e;
+  --disc2: #1a1a1f;
+  --label: #2e6f64;
+  --label-ink: #eef3ee;
+  --accent: #e0a13a;
+  --accent2: #1e4a48;
+  --ink: #eef3ee;
+  --glow: #e8c074;
+  --grain: 0.1;
+  --btn: #2e6f64;
+  --btn-ink: #eef3ee; /* 5.23:1 */
+  --accent-paper: #1e4546; /* 7.48:1 on paper-deep */
+}
+
+[data-era="70s"] {
+  /* Vinyl 33⅓ · oxblood + golden dusk, faint psychedelia · warm hiss */
+  --s1: #2a1410;
+  --s2: #0f0706;
+  --disc: #0c0c0e;
+  --disc2: #1c1614;
+  --label: #c9532b;
+  --label-ink: #fbe8d8;
+  --accent: #d9602b;
+  --accent2: #e0a13a;
+  --ink: #f6e7da;
+  --glow: #f08a3c;
+  --grain: 0.12;
+  --btn: #9c3b26; /* deepened to rust: terracotta is a mid-tone AA trap */
+  --btn-ink: #fbe8d8; /* 5.75:1 */
+  --accent-paper: #9c3b26; /* 4.86:1 on paper-deep */
+}
+
+[data-era="80s"] {
+  /* Cassette · indigo night, neon · tape hiss, mechanical clunk */
+  --s1: #161033;
+  --s2: #07061a;
+  --cass: #1a1230;
+  --label: #f0407f;
+  --accent: #f0407f;
+  --accent2: #2bd6e6;
+  --ink: #ede7ff;
+  --glow: #f0407f;
+  --grain: 0.14;
+  --btn: #f0407f;
+  --btn-ink: #2a0a16; /* 4.98:1 (80s omits --label-ink; set explicitly) */
+  --accent-paper: #8e2156; /* 5.96:1 on paper-deep */
+}
+
+[data-era="90s"] {
+  /* Compact Disc · cool slate, chrome iridescence · clean, near-silent */
+  --s1: #11202b;
+  --s2: #070d12;
+  --accent: #2bd6e6;
+  --accent2: #c060d0;
+  --ink: #e6f1f5;
+  --glow: #7fe3ee;
+  --grain: 0.07;
+  --btn: #2bd6e6;
+  --btn-ink: #06222a; /* 9.34:1 (on-palette cyan; 90s omits --label) */
+  --accent-paper: #155e6b; /* 5.24:1 on paper-deep */
+}

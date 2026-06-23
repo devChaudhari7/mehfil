@@ -1,0 +1,187 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/surfaces.css";
+
+/*
+ * @theme inline: map Tailwind color/font utilities onto our CSS variables.
+ * `inline` makes the generated utilities emit `var(--token)` rather than the
+ * resolved value, so `text-ink`, `bg-accent`, etc. react live to `[data-era]`.
+ */
+@theme inline {
+  /* Era-driven (shift with the medium) */
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent2);
+  --color-glow: var(--glow);
+  --color-label: var(--label);
+  --color-label-ink: var(--label-ink);
+  --color-btn: var(--btn);
+  --color-btn-ink: var(--btn-ink);
+  --color-accent-paper: var(--accent-paper);
+
+  /* Static warm spine */
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-paper-ink: var(--paper-ink);
+  --color-amber: var(--amber);
+  --color-terracotta: var(--terracotta);
+  --color-petrol: var(--petrol);
+  --color-valve: var(--valve);
+  --color-rust: var(--rust);
+  --color-night: var(--night);
+  --color-neon-magenta: var(--neon-magenta);
+  --color-neon-cyan: var(--neon-cyan);
+
+  /* Fonts (defined in src/lib/fonts.ts, applied on <html>) */
+  --font-display: var(--font-marcellus), "Cormorant Garamond", Georgia, serif;
+  --font-body: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+  --font-deva-display: var(--font-baloo-2), var(--font-noto-deva), serif;
+  --font-guru-display: var(--font-baloo-paaji), var(--font-noto-guru), serif;
+  --font-bangla-display: var(--font-baloo-da), var(--font-noto-bangla), serif;
+  --font-deva: var(--font-noto-deva), serif;
+  --font-guru: var(--font-noto-guru), serif;
+  --font-bangla: var(--font-noto-bangla), serif;
+}
+
+/*
+ * Type scale (rem-based, so it scales with the comfortable-reading root bump).
+ * `caption` (not `label`) avoids colliding with the `--color-label` utility.
+ * Generates text-display / text-h1.. / text-body / text-small / text-caption.
+ */
+@theme {
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.05;
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 1.1;
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.15;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+}
+
+html {
+  background: #050507;
+  color: var(--ink);
+  font-size: 100%; /* 16px base */
+}
+
+/* Comfortable-reading mode (older listeners): bump base size + leading.
+   rem-based type scale grows in lockstep. Set pre-paint by the no-flash
+   inline script in layout.tsx, so there is no hydration flash. */
+html[data-reading="comfortable"] {
+  font-size: 112.5%; /* 18px base */
+  line-height: 1.7;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  /* Foreground morphs with the era. */
+  transition: color var(--morph-dur) var(--ease-analog);
+}
+
+/* ------------------------------------------------------------------ *
+ * Stage — the per-era radial gradient backdrop. Re-renders when the
+ * `[data-era]` token set changes. (Smooth gradient *morph* via @property
+ * registration is a Phase 4 concern; Phase 0 snaps the palette.)
+ * ------------------------------------------------------------------ */
+.stage-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    125% 120% at 50% 28%,
+    var(--s1) 0%,
+    var(--s2) 70%,
+    #050507 100%
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Film grain — animated SVG feTurbulence (groove-concept.html).
+ * Opacity is driven by the per-era `--grain` token, so it auto-dims
+ * from the shellac era to the CD era.
+ * ------------------------------------------------------------------ */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: var(--grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  transition: opacity var(--morph-dur) var(--ease-analog);
+  animation: grain-shift 0.6s steps(2) infinite;
+}
+
+/* JS prong: GrainOverlay marks the layer static under reduced motion. */
+.grain[data-static] {
+  animation: none;
+}
+
+@keyframes grain-shift {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -40px 20px;
+  }
+  50% {
+    background-position: 30px -30px;
+  }
+  75% {
+    background-position: -20px 40px;
+  }
+  100% {
+    background-position: 20px 10px;
+  }
+}
+
+/* Believable 33⅓ rev (~1.8s/rotation). Applied inline by Vinyl only when
+   motion is allowed; the global reduced-motion block also freezes it. */
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Warm vignette layer (z below grain) */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  background: var(--vignette);
+}
+
+/* On-brand focus ring */
+:focus-visible {
+  outline: 2px solid var(--glow);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Reduced motion — CSS prong (defense in depth; JS prong in hooks).
+ * Freeze grain + any spin/bloom; effects degrade even without JS.
+ * ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

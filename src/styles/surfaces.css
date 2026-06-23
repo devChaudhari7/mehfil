@@ -1,0 +1,59 @@
+/*
+ * MEHFIL — surface & texture system (Phase 1).
+ *
+ * Reusable analog *materials*. The key trick: a light surface locally re-points
+ * the era tokens (`--ink`, `--accent`, `--glow`) to AA-safe dark values, so any
+ * `text-ink` / `text-accent` / focus-ring inside it flips automatically — no
+ * per-call color juggling, and it still reacts to `[data-era]`.
+ *
+ * Loaded after Tailwind, so these are plain (non-utility) classes.
+ */
+
+/* ---- Light cardboard / paper sleeve material ---- */
+.surface-paper {
+  /* in-scope token remap → descendants become AA-safe on light paper */
+  --ink: var(--paper-ink);
+  --accent: var(--accent-paper);
+  --glow: var(--accent-paper); /* dark, visible focus ring on paper */
+
+  position: relative;
+  color: var(--paper-ink);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(160deg, var(--paper) 0%, var(--paper-deep) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+  background-blend-mode: multiply;
+}
+
+/* ---- Dark per-era stage panel (inset; the global stage lives in World) ---- */
+.surface-stage {
+  position: relative;
+  color: var(--ink);
+  background: radial-gradient(
+    125% 120% at 50% 18%,
+    var(--s1) 0%,
+    var(--s2) 78%,
+    #050507 100%
+  );
+}
+
+/* ---- Texture layers (decorative; AA rules don't apply to pure decoration) ---- */
+
+/* Paper fiber as a standalone overlay (when not using .surface-paper bg). */
+.tex-paper {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Cardboard: a touch warmer/rougher than paper. */
+.tex-cardboard {
+  background-color: var(--paper-deep);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23c)' opacity='0.6'/%3E%3C/svg%3E");
+  background-blend-mode: multiply;
+}
+
+/* Halftone dot divider — uses currentColor so it inherits the era ink. */
+.tex-halftone {
+  background-image: radial-gradient(currentColor 1px, transparent 1.6px);
+  background-size: 9px 9px;
+  opacity: 0.18;
+}
