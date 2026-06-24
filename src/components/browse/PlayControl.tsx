@@ -19,10 +19,12 @@ export interface PlayControlProps {
   /** The collection this track plays within (becomes the queue). */
   queue: Track[];
   variant?: "pill" | "icon";
+  /** Called after a play/pause action (e.g. to close a search palette). */
+  onActivate?: () => void;
   className?: string;
 }
 
-export function PlayControl({ track, queue, variant = "pill", className }: PlayControlProps) {
+export function PlayControl({ track, queue, variant = "pill", onActivate, className }: PlayControlProps) {
   const currentId = usePlayerStore((s) => s.currentTrack?.id);
   const status = usePlayerStore((s) => s.status);
   const playable = canPlay(track);
@@ -33,6 +35,7 @@ export function PlayControl({ track, queue, variant = "pill", className }: PlayC
   function onClick() {
     if (isCurrent) usePlayerStore.getState().togglePlay();
     else playFromCollection(queue, track);
+    onActivate?.();
   }
 
   const label = !playable

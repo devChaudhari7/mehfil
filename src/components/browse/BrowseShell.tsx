@@ -20,12 +20,20 @@ export function BrowseShell({
         <Link href="/" className="text-ink/60 hover:text-accent underline-offset-4 hover:underline">
           ← MEHFIL
         </Link>
-        <Link
-          href="/browse"
-          className="text-ink/60 hover:text-accent underline-offset-4 hover:underline"
-        >
-          Travel the groove →
-        </Link>
+        <div className="flex items-center gap-5">
+          <Link
+            href="/search"
+            className="text-ink/60 hover:text-accent underline-offset-4 hover:underline"
+          >
+            Search
+          </Link>
+          <Link
+            href="/browse"
+            className="text-ink/60 hover:text-accent underline-offset-4 hover:underline"
+          >
+            Travel the groove →
+          </Link>
+        </div>
       </nav>
       <header className="max-w-2xl">{header}</header>
       <div className="mt-12 space-y-14">{children}</div>
