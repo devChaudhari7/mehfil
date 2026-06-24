@@ -146,9 +146,10 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
       ) : (
         <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8 sm:flex-row sm:items-center sm:gap-12">
           {/* the cassette */}
-          <div className="aspect-square w-[min(82vw,420px)] shrink-0">
+          <div className="aspect-[100/64] w-[min(88vw,460px)] shrink-0">
             <Cassette
               className="h-full w-full"
+              variant="deck"
               progress={progress}
               clock={reduced ? undefined : clock}
             />
