@@ -10,6 +10,7 @@
  */
 import { useEffect, useRef } from "react";
 import { cx } from "@/lib/cx";
+import { pointAt } from "@/lib/spiral";
 import type { InterpolatedClock } from "@/lib/useInterpolatedTime";
 
 export interface GrooveSpiralProps {
@@ -52,6 +53,7 @@ export function GrooveSpiral({ tier, clock, amplitude, className }: GrooveSpiral
       const prog = clock.getProgress();
       const turns = 14;
       const steps = turns * 64;
+      const geom = { turns, minR: maxR * 0.12, maxR };
 
       ctx.lineWidth = Math.max(dpr * 0.6, 0.6);
       ctx.strokeStyle = accent;
@@ -59,11 +61,11 @@ export function GrooveSpiral({ tier, clock, amplitude, className }: GrooveSpiral
       ctx.beginPath();
       for (let i = 0; i <= steps; i++) {
         const f = i / steps;
-        const ang = f * turns * Math.PI * 2;
-        const vib = Math.sin(ang * 3 + t * 4) * amplitude * dpr;
-        const r = maxR * (0.12 + 0.88 * f) + vib;
-        const x = cxp + Math.cos(ang) * r;
-        const y = cyp + Math.sin(ang) * r;
+        const p = pointAt(f, geom);
+        const vib = Math.sin(p.angle * 3 + t * 4) * amplitude * dpr;
+        const r = p.radius + vib;
+        const x = cxp + Math.cos(p.angle) * r;
+        const y = cyp + Math.sin(p.angle) * r;
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }

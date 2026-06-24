@@ -8,33 +8,18 @@
  */
 import { useMemo } from "react";
 import { getEra } from "@/lib/eras";
-import { catalogRepository, isPlayable, type EraDecade, type Track } from "@/lib/catalog";
-import { getDemoTracks } from "@/lib/audio";
+import { catalogRepository, type EraDecade } from "@/lib/catalog";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
-import { useSoundStore } from "@/lib/sound/useSoundStore";
-import { playNeedleDrop } from "@/lib/sound/sfx";
+import { canPlay, playFromCollection } from "@/lib/player/playFromCollection";
 import { useEraStore } from "@/lib/useEraStore";
 import { scriptFont } from "@/lib/fonts";
 import { cx } from "@/lib/cx";
-
-const demoMap = new Map(getDemoTracks().map((t) => [t.id, t] as const));
-const effective = (t: Track): Track => demoMap.get(t.id) ?? t;
 
 export function TrackNodes({ className }: { className?: string }) {
   const era = useEraStore((s) => s.era);
   const decade = getEra(era).decade as EraDecade;
   const tracks = useMemo(() => catalogRepository.tracksByEra(decade), [decade]);
   const currentId = usePlayerStore((s) => s.currentTrack?.id);
-
-  function play(track: Track) {
-    const queue = tracks.map(effective).filter(isPlayable);
-    const index = queue.findIndex((t) => t.id === track.id);
-    if (index < 0) return;
-    useSoundStore.getState().unlock();
-    usePlayerStore.getState().setQueue(queue, index);
-    usePlayerStore.getState().playQueueAt(index);
-    playNeedleDrop();
-  }
 
   return (
     <ul
@@ -45,20 +30,20 @@ export function TrackNodes({ className }: { className?: string }) {
       )}
     >
       {tracks.map((t) => {
-        const canPlay = isPlayable(effective(t));
+        const playable = canPlay(t);
         const font = scriptFont(t.script);
         const isCurrent = currentId === t.id;
         return (
           <li key={t.id}>
             <button
               type="button"
-              disabled={!canPlay}
-              onClick={() => play(t)}
-              aria-label={canPlay ? `Play ${t.title.latin}` : `${t.title.latin} — no source yet`}
-              title={canPlay ? "Play" : "No source yet — run a live ingest"}
+              disabled={!playable}
+              onClick={() => playFromCollection(tracks, t)}
+              aria-label={playable ? `Play ${t.title.latin}` : `${t.title.latin} — no source yet`}
+              title={playable ? "Play" : "No source yet — run a live ingest"}
               className={cx(
                 "rounded-full border px-3 py-1.5 text-sm transition-[background-color,color] duration-200",
-                canPlay
+                playable
                   ? "text-ink cursor-pointer border-white/15 hover:bg-white/10"
                   : "text-ink/30 cursor-not-allowed border-white/5",
                 isCurrent && "bg-btn text-btn-ink border-transparent",

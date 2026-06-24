@@ -5,3 +5,4 @@
 export * from "./types";
 export * from "./selectors";
 export * from "./repository";
+export * from "./albums";
