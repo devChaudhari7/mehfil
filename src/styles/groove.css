@@ -1,0 +1,81 @@
+/*
+ * MEHFIL — Groove hero CSS (Phase 4).
+ *
+ * 1. Register the morphable era tokens with @property so the stage gradient,
+ *    accents, ink, glow, and grain ANIMATE on a data-era swap instead of
+ *    snapping (tokens.css anticipated this). The transition lives on <html>,
+ *    where the era token values change.
+ * 2. Per-era display typography: art-deco wide tracking in the 50s, tightening
+ *    toward the 90s.
+ *
+ * The global prefers-reduced-motion block in globals.css zeroes transition
+ * durations, so the morph becomes an instant cross-cut for reduced motion.
+ */
+
+@property --s1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #16241f;
+}
+@property --s2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #070f0c;
+}
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e0a13a;
+}
+@property --accent2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1e4a48;
+}
+@property --ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #eef3ee;
+}
+@property --glow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e8c074;
+}
+@property --grain {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.1;
+}
+
+html {
+  transition:
+    --s1 var(--morph-dur) var(--ease-analog),
+    --s2 var(--morph-dur) var(--ease-analog),
+    --accent var(--morph-dur) var(--ease-analog),
+    --accent2 var(--morph-dur) var(--ease-analog),
+    --ink var(--morph-dur) var(--ease-analog),
+    --glow var(--morph-dur) var(--ease-analog),
+    --grain var(--morph-dur) var(--ease-analog);
+}
+
+/* Per-era display personality (docs/01 §3): wide art-deco → tight by the 90s. */
+.groove-display {
+  letter-spacing: 0.04em;
+  transition: letter-spacing var(--morph-dur) var(--ease-analog);
+}
+[data-era="50s"] .groove-display {
+  letter-spacing: 0.16em;
+}
+[data-era="60s"] .groove-display {
+  letter-spacing: 0.08em;
+}
+[data-era="70s"] .groove-display {
+  letter-spacing: 0.05em;
+}
+[data-era="80s"] .groove-display {
+  letter-spacing: 0.02em;
+}
+[data-era="90s"] .groove-display {
+  letter-spacing: -0.01em;
+}

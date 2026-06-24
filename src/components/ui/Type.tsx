@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import { cx } from "@/lib/cx";
 
@@ -46,14 +47,13 @@ export function Heading({
   className?: string;
   children: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"h2">, "className" | "children">) {
+  // createElement (not <Tag/>) avoids the dynamic-ElementType children inference
+  // that @react-three/fiber's JSX.IntrinsicElements augmentation collapses to never.
   const Tag = `h${level}` as ElementType;
-  return (
-    <Tag
-      className={cx("font-display text-ink", HEADING_SIZE[level], className)}
-      {...rest}
-    >
-      {children}
-    </Tag>
+  return createElement(
+    Tag,
+    { className: cx("font-display text-ink", HEADING_SIZE[level], className), ...rest },
+    children,
   );
 }
 
