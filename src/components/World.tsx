@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 import { GrainOverlay } from "@/components/GrainOverlay";
+import { PlayerBar } from "@/components/player/PlayerBar";
 
 /*
  * World — the persistent stage every route lives inside. Lays the analog
  * texture stack (stage gradient → vignette → grain), all driven by the active
  * `[data-era]` tokens, then renders page content above it.
  *
- * The persistent player bar (brief §12) mounts here in Phase 3 — placeholder slot below.
+ * The persistent player bar (brief §12) + the hidden YouTube host mount here, in
+ * the root layout, so audio + transport state survive route changes (Phase 3).
  */
 export function World({ children }: { children: ReactNode }) {
   return (
@@ -15,7 +17,18 @@ export function World({ children }: { children: ReactNode }) {
       <div className="vignette" aria-hidden="true" />
       <GrainOverlay />
       <div className="relative z-10 flex min-h-dvh flex-col">{children}</div>
-      {/* Phase 3: <PlayerBar /> persistent now-playing dock mounts here. */}
+
+      {/*
+       * Hidden YouTube host — id must match AUDIO_HOST_ID in
+       * src/lib/audio/youtube.ts. Visually hidden but NOT display:none (that
+       * breaks playback); kept here so the iframe persists across navigation.
+       */}
+      <div
+        id="mehfil-audio-host"
+        aria-hidden="true"
+        className="pointer-events-none fixed top-0 left-[-9999px] h-px w-px opacity-0"
+      />
+      <PlayerBar />
     </>
   );
 }
