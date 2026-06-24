@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { catalogRepository, filmReleases, representativeEra, type Language } from "@/lib/catalog";
-import type { Script } from "@/lib/fonts";
+import { catalogRepository, filmReleases, representativeEra } from "@/lib/catalog";
+import { scriptForLanguage } from "@/lib/fonts";
 import { Body, Heading, Mono, NativeText } from "@/components/ui";
 import { BrowseShell, RecordGrid, ReleaseCard, SetEra } from "@/components/browse";
 
@@ -10,12 +10,6 @@ import { BrowseShell, RecordGrid, ReleaseCard, SetEra } from "@/components/brows
  * generated for every catalog artist. Native name renders in its own script (from
  * the artist's language) with Latin beneath.
  */
-const SCRIPT_BY_LANGUAGE: Record<Language, Script> = {
-  hindi: "devanagari",
-  punjabi: "gurmukhi",
-  bengali: "bengali",
-  english: "latin",
-};
 
 export function generateStaticParams() {
   return catalogRepository.allArtists().map((a) => ({ id: a.id }));
@@ -52,7 +46,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
                 <NativeText
                   native={artist.name.native}
                   latin={artist.name.latin}
-                  script={SCRIPT_BY_LANGUAGE[artist.language]}
+                  script={scriptForLanguage(artist.language)}
                   size="h1"
                 />
               ) : (

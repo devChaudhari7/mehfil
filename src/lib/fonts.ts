@@ -127,3 +127,21 @@ export function scriptFont(script: Script): { display: string; body: string } {
       return { display: "font-display", body: "font-body" };
   }
 }
+
+/**
+ * The script a catalog language's NATIVE names render in (artists/UI that carry a
+ * language but not an explicit per-string script). `string` param (not the catalog
+ * `Language` type) keeps this dependency-free; English/unknown → latin.
+ */
+export function scriptForLanguage(language: string): Script {
+  switch (language) {
+    case "hindi":
+      return "devanagari";
+    case "punjabi":
+      return "gurmukhi";
+    case "bengali":
+      return "bengali";
+    default:
+      return "latin";
+  }
+}
