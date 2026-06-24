@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# ingestion pipeline (local quota checkpoint + dry-run output)
+/scripts/ingest/.cache/
+/scripts/ingest/.out/
 
 # vercel
 .vercel
