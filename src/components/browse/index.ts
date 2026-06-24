@@ -9,3 +9,4 @@ export { RecordGrid } from "./RecordGrid";
 export { ReleaseCard } from "./ReleaseCard";
 export { TrackList } from "./TrackList";
 export { EraDial } from "./EraDial";
+export { SpiralNavigator } from "./SpiralNavigator";

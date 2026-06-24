@@ -146,12 +146,20 @@ export function GrooveStage() {
         </div>
         <div data-intro className="flex flex-col items-center gap-3">
           <EraTimeline />
-          <Link
-            href="/catalog"
-            className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 hover:underline"
-          >
-            Browse as list
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/browse"
+              className="bg-btn text-btn-ink rounded-full px-4 py-1.5 font-mono text-[11px] tracking-[0.18em] uppercase transition-[filter] hover:brightness-110"
+            >
+              Travel the groove →
+            </Link>
+            <Link
+              href="/catalog"
+              className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 hover:underline"
+            >
+              Browse as list
+            </Link>
+          </div>
         </div>
       </div>
     </section>

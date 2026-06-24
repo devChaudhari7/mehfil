@@ -79,3 +79,21 @@ html {
 [data-era="90s"] .groove-display {
   letter-spacing: -0.01em;
 }
+
+/* ------------------------------------------------------------------ *
+ * Spiral navigator zoom (Phase 5). Each level mount "zooms" in. The
+ * global prefers-reduced-motion block zeroes this duration → instant.
+ * ------------------------------------------------------------------ */
+@keyframes groove-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.groove-zoom {
+  animation: groove-zoom-in 0.5s var(--ease-analog) both;
+}
