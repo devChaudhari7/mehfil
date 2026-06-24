@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { PlayerBar } from "@/components/player/PlayerBar";
+import { NowPlayingOverlay } from "@/components/player/NowPlayingOverlay";
 
 /*
  * World — the persistent stage every route lives inside. Lays the analog
@@ -29,6 +30,7 @@ export function World({ children }: { children: ReactNode }) {
         className="pointer-events-none fixed top-0 left-[-9999px] h-px w-px opacity-0"
       />
       <PlayerBar />
+      <NowPlayingOverlay />
     </>
   );
 }

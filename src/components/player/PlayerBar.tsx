@@ -10,11 +10,12 @@
  * ambience follows playback and respects the persisted mute.
  */
 import { useEffect } from "react";
-import { Disc3, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
+import { ChevronUp, Disc3, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { cx } from "@/lib/cx";
 import { scriptFont, type Script } from "@/lib/fonts";
 import { Vinyl } from "@/components/ui";
 import { artistLine, usePlayerStore } from "@/lib/player/usePlayerStore";
+import { useNowPlaying } from "@/lib/useNowPlaying";
 import { useSoundStore } from "@/lib/sound/useSoundStore";
 import { playNeedleDrop, startCrackle, stopCrackle } from "@/lib/sound/sfx";
 import { Scrubber } from "./Scrubber";
@@ -72,6 +73,7 @@ export function PlayerBar() {
   const seek = usePlayerStore((s) => s.seek);
   const setVolume = usePlayerStore((s) => s.setVolume);
   const togglePlay = usePlayerStore((s) => s.togglePlay);
+  const openNowPlaying = useNowPlaying((s) => s.setOpen);
 
   const muted = useSoundStore((s) => s.muted);
   const unlocked = useSoundStore((s) => s.unlocked);
@@ -113,8 +115,13 @@ export function PlayerBar() {
       <Scrubber value={currentTime} max={dur} onSeek={seek} className="rounded-none" />
 
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-3 py-2 sm:px-5">
-        {/* left — mini turntable + title */}
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+        {/* left — mini turntable + title; tap to expand into the cassette deck */}
+        <button
+          type="button"
+          onClick={() => openNowPlaying(true)}
+          aria-label="Open now playing"
+          className="group -mx-1 flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 text-left hover:bg-white/5"
+        >
           <Vinyl spinning={playing} size={44} />
           <div className="min-w-0">
             <span
@@ -127,7 +134,8 @@ export function PlayerBar() {
               {artistLine(track)}
             </span>
           </div>
-        </div>
+          <ChevronUp size={16} className="text-ink/40 group-hover:text-accent ml-1 shrink-0" />
+        </button>
 
         {/* center — transport */}
         <div className="flex items-center gap-1 sm:gap-2">
