@@ -53,12 +53,12 @@ interface NavNode {
 
 interface NavState {
   level: Level;
-  era: EraId;
   releaseId?: string;
 }
 
-function buildLevel(nav: NavState): { nodes: NavNode[]; queue: Track[] } {
-  if (nav.level === "eras") {
+/* Era is the single source of truth in useEraStore; level/releaseId are local. */
+function buildLevel(level: Level, era: EraId, releaseId?: string): { nodes: NavNode[]; queue: Track[] } {
+  if (level === "eras") {
     return {
       nodes: ERAS.map((e) => ({
         key: e.id,
@@ -71,8 +71,8 @@ function buildLevel(nav: NavState): { nodes: NavNode[]; queue: Track[] } {
     };
   }
 
-  if (nav.level === "records") {
-    const decade = getEra(nav.era).decade as EraDecade;
+  if (level === "records") {
+    const decade = getEra(era).decade as EraDecade;
     const tracks = catalogRepository.tracksByEra(decade);
     const releases = filmReleases(tracks);
     const singles = standaloneSingles(tracks);
@@ -98,7 +98,7 @@ function buildLevel(nav: NavState): { nodes: NavNode[]; queue: Track[] } {
   }
 
   // tracks
-  const release = nav.releaseId ? getRelease(ALL_TRACKS, nav.releaseId) : undefined;
+  const release = releaseId ? getRelease(ALL_TRACKS, releaseId) : undefined;
   const tracks = release
     ? release.trackIds
         .map((tid) => catalogRepository.getTrack(tid))
@@ -118,18 +118,18 @@ function buildLevel(nav: NavState): { nodes: NavNode[]; queue: Track[] } {
   };
 }
 
-function breadcrumb(nav: NavState): string {
-  const decade = getEra(nav.era).decade;
-  if (nav.level === "eras") return "Travel the eras";
-  if (nav.level === "records") return `${decade} · records & films`;
-  const release = nav.releaseId ? getRelease(ALL_TRACKS, nav.releaseId) : undefined;
+function breadcrumb(level: Level, era: EraId, releaseId?: string): string {
+  const decade = getEra(era).decade;
+  if (level === "eras") return "Travel the eras";
+  if (level === "records") return `${decade} · records & films`;
+  const release = releaseId ? getRelease(ALL_TRACKS, releaseId) : undefined;
   return release ? `${decade} › ${release.film}` : decade;
 }
 
-/** Where the current level's "Browse as list" link points. */
-function listHref(nav: NavState): string {
-  if (nav.level === "tracks" && nav.releaseId) return `/album/${nav.releaseId}`;
-  return `/era/${getEra(nav.era).decade}`;
+/** Where the current level's "Browse as list" link points (era from the store). */
+function listHref(level: Level, era: EraId, releaseId?: string): string {
+  if (level === "tracks" && releaseId) return `/album/${releaseId}`;
+  return `/era/${getEra(era).decade}`;
 }
 
 export function SpiralNavigator() {
@@ -139,21 +139,25 @@ export function SpiralNavigator() {
   const currentId = usePlayerStore((s) => s.currentTrack?.id);
   const status = usePlayerStore((s) => s.status);
 
-  const [nav, setNav] = useState<NavState>(() => ({ level: "eras", era: storeEra }));
+  const [nav, setNav] = useState<NavState>(() => ({ level: "eras" }));
   const [focus, setFocus] = useState(() => Math.max(ERAS.findIndex((e) => e.id === storeEra), 0));
 
-  const { nodes, queue } = useMemo(() => buildLevel(nav), [nav]);
+  const { nodes, queue } = useMemo(
+    () => buildLevel(nav.level, storeEra, nav.releaseId),
+    [nav, storeEra],
+  );
   const points = useMemo(() => nodePoints(nodes.length, GEOM, 0.2, 1), [nodes.length]);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const clampFocus = useCallback((i: number) => Math.min(Math.max(i, 0), nodes.length - 1), [nodes.length]);
 
-  // Travelling the era level morphs the palette in lockstep.
+  // Travelling the era level lifts the selection into useEraStore (single source),
+  // so the palette morphs AND "Browse as list" tracks the choice live.
   useEffect(() => {
     if (nav.level !== "eras") return;
     const node = nodes[focus];
-    if (node?.eraId) useEraStore.getState().setEra(node.eraId);
-  }, [nav.level, focus, nodes]);
+    if (node?.eraId && node.eraId !== storeEra) useEraStore.getState().setEra(node.eraId);
+  }, [nav.level, focus, nodes, storeEra]);
 
   const moveFocus = useCallback(
     (delta: number) => {
@@ -168,21 +172,21 @@ export function SpiralNavigator() {
 
   const zoomOut = useCallback(() => {
     if (nav.level === "tracks") {
-      setNav({ level: "records", era: nav.era });
+      setNav({ level: "records" });
       setFocus(0);
     } else if (nav.level === "records") {
-      setNav({ level: "eras", era: nav.era });
-      setFocus(Math.max(ERAS.findIndex((e) => e.id === nav.era), 0));
+      setNav({ level: "eras" });
+      setFocus(Math.max(ERAS.findIndex((e) => e.id === storeEra), 0));
     }
-  }, [nav]);
+  }, [nav, storeEra]);
 
   function activate(node: NavNode) {
     if (node.kind === "era" && node.eraId) {
       useEraStore.getState().setEra(node.eraId);
-      setNav({ level: "records", era: node.eraId });
+      setNav({ level: "records" });
       setFocus(0);
     } else if (node.kind === "release" && node.releaseId) {
-      setNav({ level: "tracks", era: nav.era, releaseId: node.releaseId });
+      setNav({ level: "tracks", releaseId: node.releaseId });
       setFocus(0);
     } else if (node.kind === "track" && node.track) {
       playFromCollection(queue, node.track);
@@ -239,7 +243,7 @@ export function SpiralNavigator() {
   const staticMode = reduced || tier === "C";
 
   const announce =
-    `${breadcrumb(nav)}. ` +
+    `${breadcrumb(nav.level, storeEra, nav.releaseId)}. ` +
     (focused
       ? `${focused.kind === "track" ? focused.sub ?? focused.title : focused.title}` +
         (focused.kind === "track" && focused.playable === false ? " — no source yet" : "")
@@ -264,10 +268,10 @@ export function SpiralNavigator() {
           <CornerUpLeft size={13} /> Out
         </button>
         <p className="text-ink/70 truncate font-mono text-[11px] tracking-[0.16em] uppercase">
-          {breadcrumb(nav)}
+          {breadcrumb(nav.level, storeEra, nav.releaseId)}
         </p>
         <Link
-          href={listHref(nav)}
+          href={listHref(nav.level, storeEra, nav.releaseId)}
           className="text-ink/60 hover:text-accent shrink-0 font-mono text-[11px] tracking-wide underline-offset-4 hover:underline"
         >
           As list →
@@ -323,7 +327,7 @@ export function SpiralNavigator() {
           </div>
 
           {/* nodes on the groove */}
-          <div key={`${nav.level}:${nav.era}:${nav.releaseId ?? ""}`} className="groove-zoom absolute inset-0">
+          <div key={`${nav.level}:${storeEra}:${nav.releaseId ?? ""}`} className="groove-zoom absolute inset-0">
             {nodes.map((node, i) => {
               const p = points[i] ?? pointAt(0.5, GEOM);
               const active = i === focus;
