@@ -7,6 +7,7 @@ const base: TierInputs = {
   saveData: false,
   deviceMemory: 8,
   cores: 8,
+  finePointer: true,
 };
 
 describe("pickTier", () => {
@@ -15,7 +16,7 @@ describe("pickTier", () => {
     expect(pickTier({ ...base, saveData: true })).toBe("C");
   });
 
-  it("returns A for a capable device", () => {
+  it("returns A for a capable fine-pointer device", () => {
     expect(pickTier(base)).toBe("A");
   });
 
@@ -23,5 +24,9 @@ describe("pickTier", () => {
     expect(pickTier({ ...base, webgl2: false })).toBe("B");
     expect(pickTier({ ...base, deviceMemory: 2 })).toBe("B");
     expect(pickTier({ ...base, cores: 2 })).toBe("B");
+  });
+
+  it("falls back to B on a coarse pointer (phones/tablets) — no heavy WebGL", () => {
+    expect(pickTier({ ...base, finePointer: false })).toBe("B");
   });
 });

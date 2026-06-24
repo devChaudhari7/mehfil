@@ -29,13 +29,17 @@ export function NowPlaying({ className }: { className?: string }) {
         </span>
         <span className="text-accent font-mono text-[11px] tracking-[0.14em]">{cfg.rpm}</span>
       </div>
-      <NativeText
-        native={title.native}
-        latin={title.latin}
-        script={title.script}
-        size="h2"
-        className="groove-display"
-      />
+      {/* Fixed min-height reserves the two-line (native + Latin) worst case so a
+          title / script / era / font-swap change can't push the HUD below it (CLS). */}
+      <div className="flex min-h-[4.5rem] items-center justify-center">
+        <NativeText
+          native={title.native}
+          latin={title.latin}
+          script={title.script}
+          size="h2"
+          className="groove-display"
+        />
+      </div>
       <p className="text-ink/60 font-mono text-[11px] tracking-[0.14em] uppercase">{who}</p>
     </div>
   );

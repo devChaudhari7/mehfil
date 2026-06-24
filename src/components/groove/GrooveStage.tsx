@@ -12,7 +12,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
 import { getEra } from "@/lib/eras";
 import { useEraStore } from "@/lib/useEraStore";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
@@ -34,6 +33,11 @@ const GrooveSceneWebGL = dynamic(
 
 const AMP = { slow: 0.5, mid: 1.0, fast: 1.8 } as const;
 
+// CSS-fixed reserved size for the central medium box (identical SSR↔client so it
+// never reflows after first paint — the prime CLS fix). The numeric px size below
+// is measured from this box only to feed the medium sub-components.
+const MEDIUM_SIZE = "min(66vw, 50vh, 360px)";
+
 export function GrooveStage() {
   const tier = useRenderTier();
   const era = useEraStore((s) => s.era);
@@ -42,28 +46,41 @@ export function GrooveStage() {
   const reduced = useReducedMotion();
   const clock = useInterpolatedTime();
   const rootRef = useRef<HTMLElement>(null);
-  const [size, setSize] = useState(300);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
 
   useEffect(() => {
-    const update = () =>
-      setSize(Math.round(Math.min(window.innerWidth * 0.66, window.innerHeight * 0.5, 360)));
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    const el = boxRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width ?? 0;
+      if (w) setSize(Math.round(w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
   useEffect(() => {
-    if (reduced || !rootRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-intro]", {
-        opacity: 0,
-        y: 18,
-        duration: 0.7,
-        stagger: 0.09,
-        ease: "power2.out",
-      });
-    }, rootRef);
-    return () => ctx.revert();
+    if (reduced) return;
+    // Lazy-load gsap so it stays out of the initial hydration chunk (perf).
+    let reverted = false;
+    let ctx: { revert: () => void } | undefined;
+    void import("gsap").then(({ gsap }) => {
+      if (reverted || !rootRef.current) return;
+      ctx = gsap.context(() => {
+        gsap.from("[data-intro]", {
+          opacity: 0,
+          y: 18,
+          duration: 0.7,
+          stagger: 0.09,
+          ease: "power2.out",
+        });
+      }, rootRef);
+    });
+    return () => {
+      reverted = true;
+      ctx?.revert();
+    };
   }, [reduced]);
 
   const spinning = status === "playing";
@@ -97,10 +114,17 @@ export function GrooveStage() {
         </p>
       </header>
 
-      {/* Central artifact + needle (Tier B/C; Tier A renders these in WebGL) */}
-      <div data-intro className="relative z-10 grid place-items-center" style={{ width: size, height: size }}>
+      {/* Central artifact + needle (Tier B/C; Tier A renders these in WebGL).
+          The box reserves space via CSS (MEDIUM_SIZE); the medium renders into it
+          once measured, so it paints in-place with no layout shift. */}
+      <div
+        ref={boxRef}
+        data-intro
+        className="relative z-10 grid place-items-center"
+        style={{ width: MEDIUM_SIZE, height: MEDIUM_SIZE }}
+      >
         <SynestheticBloom />
-        {tier !== "A" && (
+        {tier !== "A" && size > 0 && (
           <div className="relative" style={{ width: size, height: size }}>
             <MediumObject era={era} spinning={spinning} size={size} />
             <Needle

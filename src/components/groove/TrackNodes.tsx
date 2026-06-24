@@ -39,7 +39,10 @@ export function TrackNodes({ className }: { className?: string }) {
   return (
     <ul
       aria-label={`${decade} tracks`}
-      className={cx("flex max-h-28 flex-wrap justify-center gap-2 overflow-y-auto", className)}
+      className={cx(
+        "flex h-24 flex-wrap content-start justify-center gap-2 overflow-y-auto sm:h-28",
+        className,
+      )}
     >
       {tracks.map((t) => {
         const canPlay = isPlayable(effective(t));
