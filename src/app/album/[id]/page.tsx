@@ -74,12 +74,7 @@ export default async function AlbumPage({ params }: { params: Promise<{ id: stri
         }
       >
         <section aria-label="Album record" className="flex justify-center">
-          <AlbumHero
-            film={release.film}
-            year={release.year}
-            rpm={cfg.rpm}
-            trackIds={release.trackIds}
-          />
+          <AlbumHero release={release} rpm={cfg.rpm} />
         </section>
 
         <section aria-label="Tracklist">

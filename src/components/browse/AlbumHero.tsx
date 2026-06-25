@@ -8,27 +8,20 @@
  * record spins when a track from this release is the one playing.
  */
 import { useEffect, useRef, useState } from "react";
+import type { Release } from "@/lib/catalog";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
+import { RecordArt } from "@/components/art";
 import { RecordSleeve } from "./RecordSleeve";
 
 const PULL_ROOM = 0.45;
 
-export function AlbumHero({
-  film,
-  year,
-  rpm,
-  trackIds,
-}: {
-  film: string;
-  year: number;
-  rpm: string;
-  trackIds: string[];
-}) {
+export function AlbumHero({ release, rpm }: { release: Release; rpm: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(0);
   const currentId = usePlayerStore((s) => s.currentTrack?.id);
   const status = usePlayerStore((s) => s.status);
-  const spinning = !!currentId && trackIds.includes(currentId) && status === "playing";
+  const spinning =
+    !!currentId && release.trackIds.includes(currentId) && status === "playing";
 
   useEffect(() => {
     const el = ref.current;
@@ -48,14 +41,8 @@ export function AlbumHero({
       style={{ height: "min(86vw, 360px)" }}
     >
       {size > 0 && (
-        <RecordSleeve size={size} pullRoom={PULL_ROOM} label={rpm} spinning={spinning}>
-          <div className="text-ink">
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase opacity-70">
-              Film soundtrack
-            </span>
-            <div className="font-display mt-2 text-2xl leading-tight">{film}</div>
-            <div className="font-mono mt-2 text-sm tabular-nums opacity-70">{year}</div>
-          </div>
+        <RecordSleeve size={size} pullRoom={PULL_ROOM} label={rpm} spinning={spinning} bleed>
+          <RecordArt subject={{ release }} size="lg" variant="sleeve" decorativeTitle />
         </RecordSleeve>
       )}
     </div>

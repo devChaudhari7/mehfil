@@ -9,7 +9,7 @@
 import type { Track } from "@/lib/catalog";
 import { decadeToEraId } from "@/lib/catalog";
 import { getEra } from "@/lib/eras";
-import { NativeText } from "@/components/ui";
+import { RecordArt } from "@/components/art";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { cx } from "@/lib/cx";
 import { RecordSleeve } from "./RecordSleeve";
@@ -32,25 +32,11 @@ export function TrackCard({ track, queue, size = 180, className }: TrackCardProp
 
   return (
     <li className={cx("flex flex-col items-center gap-3", className)}>
-      <RecordSleeve size={size} pullRoom={0.24} label={rpm} spinning={spinning}>
-        <div className="text-ink">
-          <span className="font-mono text-[10px] tracking-[0.22em] uppercase opacity-70">
-            {track.language}
-          </span>
-          <div className="font-display mt-0.5 text-3xl tabular-nums">{track.year}</div>
-          {track.film && (
-            <div className="font-body mt-1 line-clamp-2 text-xs opacity-75">{track.film}</div>
-          )}
-        </div>
+      <RecordSleeve size={size} pullRoom={0.24} label={rpm} spinning={spinning} bleed>
+        <RecordArt subject={{ track }} variant="sleeve" />
       </RecordSleeve>
 
       <div className="flex flex-col items-center gap-2 text-center" style={{ maxWidth: size }}>
-        <NativeText
-          native={track.title.native}
-          latin={track.title.latin}
-          script={track.script}
-          size="body"
-        />
         <PlayControl track={track} queue={queue} />
       </div>
     </li>

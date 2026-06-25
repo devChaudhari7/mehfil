@@ -11,6 +11,7 @@ import {
 } from "@/lib/catalog";
 import { Heading, Mono, NativeText } from "@/components/ui";
 import { BrowseShell } from "@/components/browse";
+import { RecordArt } from "@/components/art";
 import { CatalogPlayButton } from "@/components/player/CatalogPlayButton";
 
 /*
@@ -101,6 +102,9 @@ export default function LibraryPage() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-white/10">
+                <th scope="col" className="px-4 py-3">
+                  <span className="sr-only">Sleeve</span>
+                </th>
                 {["Play", "Title", "Era", "Language", "Region"].map((h) => (
                   <th key={h} scope="col" className="px-4 py-3">
                     <Mono className="text-ink/60">{h}</Mono>
@@ -111,6 +115,11 @@ export default function LibraryPage() {
             <tbody>
               {tracks.map((t) => (
                 <tr key={t.id} className="border-b border-white/5 align-top last:border-0">
+                  <td className="px-4 py-3">
+                    <span className="block h-10 w-10 overflow-hidden rounded-[3px] shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+                      <RecordArt subject={{ track: t }} size="sm" variant="swatch" />
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <CatalogPlayButton trackId={t.id} />
                   </td>

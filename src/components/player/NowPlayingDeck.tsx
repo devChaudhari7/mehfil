@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Pause, Play, SkipBack, SkipForward, X } from "lucide-react";
 import { Cassette } from "@/components/groove/Cassette";
 import { NativeText } from "@/components/ui";
+import { RecordArt } from "@/components/art";
 import { artistLine, usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useInterpolatedTime } from "@/lib/useInterpolatedTime";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -158,16 +159,26 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
           {/* J-card */}
           <div className="w-full max-w-sm">
             <div className="surface-paper rounded-[10px] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
-              <span className="text-ink/60 font-mono text-[10px] tracking-[0.22em] uppercase">
-                {track.era} {track.film ? `· ${track.film}` : ""}
-              </span>
-              <div className="mt-3">
-                <NativeText
-                  native={track.title.native}
-                  latin={track.title.latin}
-                  script={track.script}
-                  size="h2"
-                />
+              <div className="flex items-start gap-4">
+                <span
+                  aria-hidden="true"
+                  className="block h-16 w-16 shrink-0 overflow-hidden rounded-[4px] shadow-[0_3px_8px_rgba(0,0,0,0.4)]"
+                >
+                  <RecordArt subject={{ track }} size="sm" variant="swatch" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="text-ink/60 font-mono text-[10px] tracking-[0.22em] uppercase">
+                    {track.era} {track.film ? `· ${track.film}` : ""}
+                  </span>
+                  <div className="mt-2">
+                    <NativeText
+                      native={track.title.native}
+                      latin={track.title.latin}
+                      script={track.script}
+                      size="h2"
+                    />
+                  </div>
+                </div>
               </div>
               <p className="text-ink/70 mt-3 font-mono text-[11px] tracking-[0.14em] uppercase">
                 {artistLine(track)}
