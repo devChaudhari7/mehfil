@@ -8,6 +8,13 @@
  * era-tinted light + a groove ring carry the palette. Colors are read LIVE from
  * the morphing CSS tokens (eraColors), so the 3D palette stays in lockstep with
  * the DOM without duplicating any hex.
+ *
+ * THREE.Clock note (Phase 8): this scene constructs no Clock — spin is driven by
+ * useFrame's delta + the interpolated clock. three r0.184 deprecates THREE.Clock
+ * (in favour of THREE.Timer); the deprecation warning seen in the Tier-A console
+ * originates in @react-three/fiber's internal render loop, not our code. We are
+ * already on the latest @react-three/fiber (9.6.1) + three (0.184) — there is no
+ * newer release to adopt, so it clears upstream when R3F migrates to Timer.
  */
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";

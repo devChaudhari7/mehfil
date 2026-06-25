@@ -100,7 +100,7 @@ export function SearchPalette() {
       />
       <div
         ref={panelRef}
-        className="surface-stage relative z-10 max-h-[76vh] w-full max-w-xl overflow-auto rounded-2xl border border-white/10 p-5 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+        className="surface-stage overlay-in relative z-10 max-h-[76vh] w-full max-w-xl overflow-auto rounded-2xl border border-white/10 p-5 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
       >
         <SearchBox autoFocus onSelect={() => setOpen(false)} />
         <p className="text-ink/40 mt-4 text-right font-mono text-[10px] tracking-[0.16em] uppercase">

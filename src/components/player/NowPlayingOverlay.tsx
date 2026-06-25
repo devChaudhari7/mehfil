@@ -61,11 +61,14 @@ export function NowPlayingOverlay() {
 
   return (
     <div role="dialog" aria-modal="true" aria-label="Now playing" className="fixed inset-0 z-[60]">
-      <div aria-hidden="true" className="absolute inset-0 bg-[#050507]/80 backdrop-blur-md" />
+      <div
+        aria-hidden="true"
+        className="overlay-fade absolute inset-0 bg-[#050507]/80 backdrop-blur-md"
+      />
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="surface-stage absolute inset-0 overflow-auto outline-none"
+        className="surface-stage overlay-fade absolute inset-0 overflow-auto outline-none"
       >
         <NowPlayingDeck onClose={() => setOpen(false)} />
       </div>
