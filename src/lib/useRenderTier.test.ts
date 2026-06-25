@@ -16,17 +16,11 @@ describe("pickTier", () => {
     expect(pickTier({ ...base, saveData: true })).toBe("C");
   });
 
-  it("returns A for a capable fine-pointer device", () => {
-    expect(pickTier(base)).toBe("A");
-  });
-
-  it("falls back to B without webgl2 or on a low-end device", () => {
+  it("returns B for a capable device (Tier A / WebGL is disabled)", () => {
+    expect(pickTier(base)).toBe("B");
     expect(pickTier({ ...base, webgl2: false })).toBe("B");
     expect(pickTier({ ...base, deviceMemory: 2 })).toBe("B");
     expect(pickTier({ ...base, cores: 2 })).toBe("B");
-  });
-
-  it("falls back to B on a coarse pointer (phones/tablets) — no heavy WebGL", () => {
     expect(pickTier({ ...base, finePointer: false })).toBe("B");
   });
 });

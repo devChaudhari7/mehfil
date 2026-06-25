@@ -1,6 +1,6 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, PointerEvent } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { cx } from "@/lib/cx";
 
@@ -53,6 +53,21 @@ export function Dial({
     if (next !== value) onChange(next);
   }
 
+  // Click-to-set: map the pointer's angle (from 12 o'clock, clockwise) onto the
+  // dial's sweep → nearest station. Pointer-DOWN only, so a click selects once and
+  // a consumer like EraDial doesn't fire a burst of navigations while dragging.
+  function onPointerDown(e: PointerEvent<HTMLDivElement>) {
+    if (!onChange) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const dx = e.clientX - (rect.left + rect.width / 2);
+    const dy = e.clientY - (rect.top + rect.height / 2);
+    let ang = (Math.atan2(dx, -dy) * 180) / Math.PI; // 0 at top, clockwise +
+    ang = Math.min(Math.max(ang, START), START + ARC);
+    const next = clamp(Math.round(((ang - START) / ARC) * max));
+    e.currentTarget.focus();
+    if (next !== value) onChange(next);
+  }
+
   return (
     <div
       role="slider"
@@ -63,7 +78,11 @@ export function Dial({
       aria-valuenow={value}
       aria-valuetext={labels?.[value]}
       onKeyDown={onKeyDown}
-      className={cx("relative grid place-items-center rounded-full", className)}
+      onPointerDown={onPointerDown}
+      className={cx(
+        "relative grid touch-none cursor-pointer place-items-center rounded-full select-none",
+        className,
+      )}
       style={{ width: size, height: size }}
     >
       {/* knob face */}

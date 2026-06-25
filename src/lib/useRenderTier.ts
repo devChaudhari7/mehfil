@@ -27,16 +27,13 @@ export interface TierInputs {
   finePointer: boolean;
 }
 
-export function pickTier({
-  reducedMotion,
-  webgl2,
-  saveData,
-  deviceMemory,
-  cores,
-  finePointer,
-}: TierInputs): RenderTier {
+export function pickTier({ reducedMotion, saveData }: TierInputs): RenderTier {
+  // Tier A (WebGL) is intentionally disabled: the 3D disc read as a flat black
+  // oval and added the three.js cost for little gain. The rich 2D DOM medium
+  // (grooved vinyl / cassette reels / iridescent CD + RPM label) and the canvas
+  // groove spiral (Tier B) are the shipped experience; reduced-motion/data-saver
+  // → Tier C static. The remaining TierInputs are still detected for future use.
   if (reducedMotion || saveData) return "C";
-  if (webgl2 && finePointer && deviceMemory >= 4 && cores >= 4) return "A";
   return "B";
 }
 

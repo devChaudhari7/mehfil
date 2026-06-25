@@ -12,7 +12,7 @@ import {
   playableCount,
 } from "@/lib/catalog";
 import { Body, Heading, Mono, NativeText } from "@/components/ui";
-import { DemoPlayButton } from "@/components/player/DemoPlayButton";
+import { CatalogPlayButton } from "@/components/player/CatalogPlayButton";
 
 /*
  * Phase 2 debug route — proves the CatalogRepository + selectors.
@@ -139,7 +139,7 @@ export default function CatalogDebugPage() {
                     data-playable={isPlayable(t)}
                   >
                     <td className="px-4 py-3">
-                      <DemoPlayButton trackId={t.id} />
+                      <CatalogPlayButton trackId={t.id} />
                     </td>
                     <td className="px-4 py-3">
                       <NativeText
@@ -179,10 +179,10 @@ export default function CatalogDebugPage() {
         <code className="text-ink/80">CatalogRepository</code> (swappable for SQLite/Postgres
         later). Run <code className="text-ink/80">npm run ingest:dry</code> to preview the
         merge offline; a live run with a <code className="text-ink/80">YOUTUBE_API_KEY</code>{" "}
-        resolves source IDs and lifts the playable count above 0. The{" "}
-        <strong className="text-ink/80">Play</strong> buttons use a dev-only demo set (a few
-        official videoIds, never written to <code className="text-ink/80">catalog.json</code>)
-        to exercise the Phase 3 player until ingestion fills real sources.
+        resolves source IDs and lifts the playable count above 0. A live ingest has run, so
+        the <strong className="text-ink/80">Play</strong> buttons are enabled for every track
+        with a real, embeddable source (plus a few dev demo overlays); unresolved seeds stay
+        disabled until a future run matches them.
       </footer>
     </main>
   );

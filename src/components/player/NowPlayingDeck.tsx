@@ -120,7 +120,7 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
   ) : null;
 
   return (
-    <div className="flex min-h-full w-full flex-col px-5 py-5 sm:px-8 sm:py-7">
+    <div className="flex min-h-dvh w-full flex-col px-5 py-5 sm:px-8 sm:py-7">
       <div className="flex items-center justify-between">
         <p className="text-accent font-mono text-[11px] tracking-[0.28em] uppercase">
           Now Playing · Tape
