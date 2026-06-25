@@ -29,6 +29,8 @@ export interface RecordSleeveProps {
   pullRoom?: number;
   /** Controlled slide; omit to self-manage on hover. */
   pulled?: boolean;
+  /** Render the jacket face full-bleed (e.g. a RecordArt sleeve). */
+  bleed?: boolean;
   className?: string;
 }
 
@@ -39,6 +41,7 @@ export function RecordSleeve({
   spinning = false,
   pullRoom = 0.45,
   pulled,
+  bleed = false,
   className,
 }: RecordSleeveProps) {
   const reduced = useReducedMotion();
@@ -80,7 +83,9 @@ export function RecordSleeve({
 
       {/* the jacket on top */}
       <div className="absolute inset-y-0 left-0" style={{ width: size }}>
-        <Sleeve hole>{children}</Sleeve>
+        <Sleeve hole bleed={bleed}>
+          {children}
+        </Sleeve>
       </div>
     </div>
   );

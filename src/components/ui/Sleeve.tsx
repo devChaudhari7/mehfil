@@ -13,10 +13,21 @@ export interface SleeveProps {
   children?: ReactNode;
   spine?: boolean;
   hole?: boolean;
+  /**
+   * Render `children` full-bleed (edge-to-edge under the spine/hole) instead of
+   * as bottom-aligned padded text — for a printed sleeve FACE (e.g. RecordArt).
+   */
+  bleed?: boolean;
   className?: string;
 }
 
-export function Sleeve({ children, spine = true, hole = false, className }: SleeveProps) {
+export function Sleeve({
+  children,
+  spine = true,
+  hole = false,
+  bleed = false,
+  className,
+}: SleeveProps) {
   return (
     <div
       className={cx(
@@ -25,6 +36,9 @@ export function Sleeve({ children, spine = true, hole = false, className }: Slee
         className,
       )}
     >
+      {/* full-bleed face (drawn first so the jacket details read on top of it) */}
+      {bleed && <div className="absolute inset-0">{children}</div>}
+
       {/* bound spine */}
       {spine && (
         <div
@@ -41,11 +55,11 @@ export function Sleeve({ children, spine = true, hole = false, className }: Slee
         />
       )}
 
-      <div
-        className={cx("relative flex h-full flex-col justify-end p-5", spine && "pl-7")}
-      >
-        {children}
-      </div>
+      {!bleed && (
+        <div className={cx("relative flex h-full flex-col justify-end p-5", spine && "pl-7")}>
+          {children}
+        </div>
+      )}
     </div>
   );
 }
