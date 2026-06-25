@@ -22,6 +22,12 @@ export function BrowseShell({
         </Link>
         <div className="flex items-center gap-5">
           <Link
+            href="/catalog"
+            className="text-ink/60 hover:text-accent underline-offset-4 hover:underline"
+          >
+            Library
+          </Link>
+          <Link
             href="/search"
             className="text-ink/60 hover:text-accent underline-offset-4 hover:underline"
           >

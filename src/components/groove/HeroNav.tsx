@@ -23,7 +23,7 @@ export function HeroNav() {
         href="/catalog"
         className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 hover:underline"
       >
-        Browse as list
+        The Library
       </Link>
     </div>
   );

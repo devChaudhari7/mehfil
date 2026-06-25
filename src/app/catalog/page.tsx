@@ -1,189 +1,136 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   catalogRepository,
   countsByEra,
   countsByLanguage,
   countsByRegion,
   ERA_DECADES,
-  isPlayable,
   LANGUAGES,
   REGIONS,
-  playableCount,
 } from "@/lib/catalog";
-import { Body, Heading, Mono, NativeText } from "@/components/ui";
+import { Heading, Mono, NativeText } from "@/components/ui";
+import { BrowseShell } from "@/components/browse";
 import { CatalogPlayButton } from "@/components/player/CatalogPlayButton";
 
 /*
- * Phase 2 debug route — proves the CatalogRepository + selectors.
- * Server component: reads the bundled seed through the repository and renders
- * counts by era / language / region + the playable() count. `playable()` reads
- * 0 until a real ingestion run resolves sourceIds — by design (no invented IDs).
+ * /catalog — "The Library": the accessible, list-mode browse hub (the "Browse as
+ * list" destination). Facet chips (era / language / region) make every zone one
+ * click away; the full record list plays through the gated CatalogPlayButton.
  */
 export const metadata: Metadata = {
-  title: "Catalog — MEHFIL debug",
+  title: "The Library — MEHFIL",
 };
 
 const tracks = catalogRepository.allTracks();
-const artists = catalogRepository.allArtists();
-const albums = catalogRepository.allAlbums();
 
-function Stat({ label, value }: { label: string; value: ReactNode }) {
+const LANGUAGE_LABEL: Record<string, string> = {
+  hindi: "Hindi",
+  punjabi: "Punjabi",
+  bengali: "Bengali",
+  english: "English",
+};
+const REGION_LABEL: Record<string, string> = { india: "India", west: "The West" };
+
+function Facet({ href, label, count }: { href: string; label: string; count: number }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] p-5">
-      <Mono className="text-accent">{label}</Mono>
-      <div className="font-display text-ink mt-2 text-4xl tabular-nums">{value}</div>
-    </div>
+    <Link
+      href={href}
+      className="hover:border-accent/50 group flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 transition-colors hover:bg-white/5"
+    >
+      <span className="text-ink font-body text-sm">{label}</span>
+      <span className="text-ink/45 font-mono text-[11px] tabular-nums">{count}</span>
+    </Link>
   );
 }
 
-function CountTable({
-  caption,
-  rows,
+function FacetRow({
+  label,
+  children,
 }: {
-  caption: string;
-  rows: ReadonlyArray<{ key: string; count: number }>;
+  label: string;
+  children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] p-5">
-      <Mono className="text-accent">{caption}</Mono>
-      <dl className="mt-4 space-y-2">
-        {rows.map((r) => (
-          <div key={r.key} className="flex items-baseline justify-between gap-4">
-            <dt className="text-ink/80 font-mono text-sm tracking-wide">{r.key}</dt>
-            <dd className="text-ink font-display text-xl tabular-nums">{r.count}</dd>
-          </div>
-        ))}
-      </dl>
+    <section aria-label={`Browse by ${label}`}>
+      <Mono className="text-ink/50">{label}</Mono>
+      <div className="mt-3 flex flex-wrap gap-2.5">{children}</div>
     </section>
   );
 }
 
-export default function CatalogDebugPage() {
+export default function LibraryPage() {
   const eraCounts = countsByEra(tracks);
-  const languageCounts = countsByLanguage(tracks);
+  const langCounts = countsByLanguage(tracks);
   const regionCounts = countsByRegion(tracks);
-  const playable = playableCount(tracks);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-16 sm:py-20">
-      <header className="max-w-2xl">
-        <Mono className="text-accent">Mehfil · Phase 2 — Catalog data layer</Mono>
-        <Heading level={1} className="mt-5">
-          Catalog repository &amp; selectors
-        </Heading>
-        <Body className="text-ink/75 mt-4">
-          Read through <code className="text-ink/90">CatalogRepository</code> over the seed{" "}
-          <code className="text-ink/90">catalog.json</code>. Every track is{" "}
-          <em>playable</em> only once ingestion resolves a real, embeddable upload — so the
-          count below is 0 until a live API run fills the source IDs.
-        </Body>
-      </header>
+    <BrowseShell
+      header={
+        <>
+          <Mono className="text-accent">The Library</Mono>
+          <Heading level={1} className="mt-4">
+            Every record
+          </Heading>
+          <p className="text-ink/70 mt-3 font-body">
+            {tracks.length} records across five eras and four languages. Browse by zone, or
+            scan the full list below.
+          </p>
+        </>
+      }
+    >
+      <FacetRow label="By era">
+        {ERA_DECADES.map((d) => (
+          <Facet key={d} href={`/era/${d}`} label={d} count={eraCounts[d] ?? 0} />
+        ))}
+      </FacetRow>
+      <FacetRow label="By language">
+        {LANGUAGES.map((l) => (
+          <Facet key={l} href={`/language/${l}`} label={LANGUAGE_LABEL[l] ?? l} count={langCounts[l] ?? 0} />
+        ))}
+      </FacetRow>
+      <FacetRow label="By region">
+        {REGIONS.map((r) => (
+          <Facet key={r} href={`/region/${r}`} label={REGION_LABEL[r] ?? r} count={regionCounts[r] ?? 0} />
+        ))}
+      </FacetRow>
 
-      <section
-        aria-label="Catalog totals"
-        className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4"
-      >
-        <Stat label="Tracks" value={tracks.length} />
-        <Stat label="Artists" value={artists.length} />
-        <Stat label="Albums" value={albums.length} />
-        <Stat label="Playable" value={playable} />
-      </section>
-
-      <section
-        aria-label="Counts by facet"
-        className="mt-6 grid gap-4 md:grid-cols-3"
-      >
-        <CountTable
-          caption="By era"
-          rows={ERA_DECADES.map((era) => ({ key: era, count: eraCounts[era] ?? 0 }))}
-        />
-        <CountTable
-          caption="By language"
-          rows={LANGUAGES.map((lang) => ({
-            key: lang,
-            count: languageCounts[lang] ?? 0,
-          }))}
-        />
-        <CountTable
-          caption="By region"
-          rows={REGIONS.map((region) => ({
-            key: region,
-            count: regionCounts[region] ?? 0,
-          }))}
-        />
-      </section>
-
-      <section aria-label="All tracks" className="mt-12">
-        <Heading level={2}>Tracks ({tracks.length})</Heading>
+      <section aria-label="All records">
+        <Heading level={2}>All records ({tracks.length})</Heading>
         <div className="mt-5 overflow-x-auto rounded-2xl border border-white/10">
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-white/10">
-                {["Play", "Title", "Era", "Language", "Region", "Resolved", "Embeddable"].map(
-                  (h) => (
-                    <th key={h} scope="col" className="px-4 py-3">
-                      <Mono className="text-ink/60">{h}</Mono>
-                    </th>
-                  ),
-                )}
+                {["Play", "Title", "Era", "Language", "Region"].map((h) => (
+                  <th key={h} scope="col" className="px-4 py-3">
+                    <Mono className="text-ink/60">{h}</Mono>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {tracks.map((t) => {
-                const resolved = t.sourceId !== "";
-                return (
-                  <tr
-                    key={t.id}
-                    className="border-b border-white/5 last:border-0 align-top"
-                    data-playable={isPlayable(t)}
-                  >
-                    <td className="px-4 py-3">
-                      <CatalogPlayButton trackId={t.id} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <NativeText
-                        native={t.title.native}
-                        latin={t.title.latin}
-                        script={t.script}
-                        size="body"
-                      />
-                    </td>
-                    <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.era}</td>
-                    <td className="text-ink/80 px-4 py-3 font-mono text-sm">
-                      {t.language}
-                    </td>
-                    <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.region}</td>
-                    <td className="px-4 py-3 font-mono text-sm">
-                      <span className={resolved ? "text-glow" : "text-ink/40"}>
-                        {resolved ? "✓" : "—"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-sm">
-                      <span className="text-ink/70">
-                        {t.provenance.embeddable === null
-                          ? "—"
-                          : String(t.provenance.embeddable)}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+              {tracks.map((t) => (
+                <tr key={t.id} className="border-b border-white/5 align-top last:border-0">
+                  <td className="px-4 py-3">
+                    <CatalogPlayButton trackId={t.id} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <NativeText
+                      native={t.title.native}
+                      latin={t.title.latin}
+                      script={t.script}
+                      size="body"
+                    />
+                  </td>
+                  <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.era}</td>
+                  <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.language}</td>
+                  <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.region}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </section>
-
-      <footer className="text-ink/55 mt-12 max-w-2xl border-t border-white/10 pt-6 font-mono text-[11px] leading-relaxed">
-        Backing store is <code className="text-ink/80">src/data/catalog.json</code> behind{" "}
-        <code className="text-ink/80">CatalogRepository</code> (swappable for SQLite/Postgres
-        later). Run <code className="text-ink/80">npm run ingest:dry</code> to preview the
-        merge offline; a live run with a <code className="text-ink/80">YOUTUBE_API_KEY</code>{" "}
-        resolves source IDs and lifts the playable count above 0. A live ingest has run, so
-        the <strong className="text-ink/80">Play</strong> buttons are enabled for every track
-        with a real, embeddable source (plus a few dev demo overlays); unresolved seeds stay
-        disabled until a future run matches them.
-      </footer>
-    </main>
+    </BrowseShell>
   );
 }
