@@ -4,32 +4,34 @@
  * GrooveStage — the Groove hero orchestrator (docs/02).
  *
  * Picks the render tier, reads the era + player stores, owns the interpolated
- * clock, and lays out the scene (Tier A WebGL / Tier B canvas / Tier C static) +
- * the DOM HUD. One orchestrated GSAP load sequence fades the HUD in (skipped under
- * reduced motion). Tier A is code-split + lazy (ssr:false) so the heavy WebGL
- * chunk never blocks first paint; Tier C renders until the client settles.
+ * clock, and lays out the scene + the DOM HUD. The decorative scene and the central
+ * medium artifact are dynamic-imported (ssr:false) so their code stays out of the
+ * initial hydration chunk; both are CLS-safe to defer (scene is absolute/out-of-flow,
+ * the medium renders into a CSS-reserved box). The static header + entry links are
+ * SERVER components passed in (intro / nav), so that markup isn't hydrated. One GSAP
+ * load sequence fades the HUD in (skipped under reduced motion).
  */
 import dynamic from "next/dynamic";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getEra } from "@/lib/eras";
 import { useEraStore } from "@/lib/useEraStore";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useRenderTier } from "@/lib/useRenderTier";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useInterpolatedTime } from "@/lib/useInterpolatedTime";
-import { GrooveSpiral } from "./GrooveSpiral";
-import { MediumObject } from "./MediumObject";
-import { Needle } from "./Needle";
 import { SynestheticBloom } from "./SynestheticBloom";
 import { NowPlaying } from "./NowPlaying";
 import { TrackNodes } from "./TrackNodes";
 import { EraTimeline } from "./EraTimeline";
 
-const GrooveSceneWebGL = dynamic(
-  () => import("./webgl/GrooveSceneWebGL").then((m) => m.GrooveSceneWebGL),
-  { ssr: false, loading: () => null },
-);
+const GrooveScene = dynamic(() => import("./GrooveScene").then((m) => m.GrooveScene), {
+  ssr: false,
+  loading: () => null,
+});
+const MediumArtifact = dynamic(() => import("./MediumArtifact").then((m) => m.MediumArtifact), {
+  ssr: false,
+  loading: () => null,
+});
 
 const AMP = { slow: 0.5, mid: 1.0, fast: 1.8 } as const;
 
@@ -38,7 +40,7 @@ const AMP = { slow: 0.5, mid: 1.0, fast: 1.8 } as const;
 // is measured from this box only to feed the medium sub-components.
 const MEDIUM_SIZE = "min(66vw, 50vh, 360px)";
 
-export function GrooveStage() {
+export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode }) {
   const tier = useRenderTier();
   const era = useEraStore((s) => s.era);
   const status = usePlayerStore((s) => s.status);
@@ -95,28 +97,16 @@ export function GrooveStage() {
       aria-label="The Groove"
       className="relative flex min-h-[100svh] w-full flex-col items-center justify-between overflow-hidden px-5 pt-10 pb-28 sm:pt-14 sm:pb-32"
     >
-      {/* Scene layer (decorative; HUD sits above and is interactive) */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        {tier === "A" ? (
-          <GrooveSceneWebGL clock={clock} />
-        ) : (
-          <GrooveSpiral tier={tier} clock={clock} amplitude={amplitude} />
-        )}
-      </div>
+      {/* Decorative backdrop (dynamic; absolute → CLS-safe to defer) */}
+      <GrooveScene tier={tier} clock={clock} amplitude={amplitude} />
 
       <header data-intro className="relative z-10 text-center">
-        <p className="text-accent font-mono text-[11px] tracking-[0.32em] uppercase">
-          The medium is the map
-        </p>
-        <h1 className="groove-display font-display text-ink mt-3 text-3xl sm:text-5xl">MEHFIL</h1>
-        <p className="text-ink/70 mt-2 font-body text-sm">
-          Don&rsquo;t scroll the library. Travel the groove.
-        </p>
+        {intro}
       </header>
 
-      {/* Central artifact + needle (Tier B/C; Tier A renders these in WebGL).
-          The box reserves space via CSS (MEDIUM_SIZE); the medium renders into it
-          once measured, so it paints in-place with no layout shift. */}
+      {/* Central artifact + needle (Tier A renders these in WebGL). The box reserves
+          space via CSS (MEDIUM_SIZE); the medium renders into it once measured, so it
+          paints in-place with no layout shift. */}
       <div
         ref={boxRef}
         data-intro
@@ -125,15 +115,14 @@ export function GrooveStage() {
       >
         <SynestheticBloom />
         {tier !== "A" && size > 0 && (
-          <div className="relative" style={{ width: size, height: size }}>
-            <MediumObject era={era} spinning={spinning} size={size} />
-            <Needle
-              clock={clock}
-              visible={showNeedle}
-              animated={tier === "B" && !reduced}
-              size={size}
-            />
-          </div>
+          <MediumArtifact
+            era={era}
+            spinning={spinning}
+            showNeedle={showNeedle}
+            animated={tier === "B" && !reduced}
+            clock={clock}
+            size={size}
+          />
         )}
       </div>
 
@@ -146,26 +135,7 @@ export function GrooveStage() {
         </div>
         <div data-intro className="flex flex-col items-center gap-3">
           <EraTimeline />
-          <div className="flex items-center gap-4">
-            <Link
-              href="/browse"
-              className="bg-btn text-btn-ink rounded-full px-4 py-1.5 font-mono text-[11px] tracking-[0.18em] uppercase transition-[filter] hover:brightness-110"
-            >
-              Travel the groove →
-            </Link>
-            <Link
-              href="/search"
-              className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 hover:underline"
-            >
-              Search
-            </Link>
-            <Link
-              href="/catalog"
-              className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 hover:underline"
-            >
-              Browse as list
-            </Link>
-          </div>
+          {nav}
         </div>
       </div>
     </section>

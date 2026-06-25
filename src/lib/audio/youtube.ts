@@ -8,6 +8,15 @@
  *
  * No autoplay: load() only CUEs the video; the store calls play() from within
  * the user's gesture. Embed-only — we never touch the media stream.
+ *
+ * bfcache (Phase 8): on a production build the home/route pages PASS Lighthouse's
+ * back/forward-cache audit — nothing here blocks it before playback (no
+ * unload/beforeunload; the iframe + AudioContext are created only after the play
+ * gesture). The "prevented bf-cache" warning observed in development is the Next dev
+ * server's HMR WebSocket, which is dev-only. Once a track is playing, the YouTube
+ * IFrame embed itself is an intrinsic bf-cache blocker; per the agreed rule we keep
+ * the player intact rather than tearing it down to chase the cache. We DO fully tear
+ * the player + interval down in destroy().
  */
 import { createEmitter, type AudioProvider, type PlayableTrack } from "./types";
 
