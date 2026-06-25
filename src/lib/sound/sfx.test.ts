@@ -1,6 +1,15 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
-import { buildCrackle, buildNeedleDrop, samplesToWavDataUri } from "./sfx";
+import {
+  buildCassetteClunk,
+  buildCdSilence,
+  buildCrackle,
+  buildNeedleDrop,
+  buildShellacCrackle,
+  buildTapeHiss,
+  buildVinylWarmHiss,
+  samplesToWavDataUri,
+} from "./sfx";
 
 function decodeHeader(dataUri: string): { prefixOk: boolean; riff: string; wave: string } {
   const prefix = "data:audio/wav;base64,";
@@ -32,5 +41,20 @@ describe("SFX synthesis", () => {
     expect(prefixOk).toBe(true);
     expect(riff).toBe("RIFF");
     expect(wave).toBe("WAVE");
+  });
+
+  it("builds every era ambient bed + the cassette-door clunk as valid WAVs", () => {
+    for (const build of [
+      buildShellacCrackle,
+      buildVinylWarmHiss,
+      buildTapeHiss,
+      buildCdSilence,
+      buildCassetteClunk,
+    ]) {
+      const { prefixOk, riff, wave } = decodeHeader(build());
+      expect(prefixOk).toBe(true);
+      expect(riff).toBe("RIFF");
+      expect(wave).toBe("WAVE");
+    }
   });
 });

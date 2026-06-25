@@ -9,6 +9,7 @@
  */
 import { useEffect, useRef } from "react";
 import { useNowPlaying } from "@/lib/useNowPlaying";
+import { playCassetteClunk } from "@/lib/sound/sfx";
 import { NowPlayingDeck } from "./NowPlayingDeck";
 
 const FOCUSABLE =
@@ -22,6 +23,7 @@ export function NowPlayingOverlay() {
 
   useEffect(() => {
     if (!open) return;
+    playCassetteClunk(); // mechanical cassette-door clunk on open (self-gates on mute)
     restoreRef.current = document.activeElement as HTMLElement | null;
     panelRef.current?.focus();
     const prevOverflow = document.body.style.overflow;

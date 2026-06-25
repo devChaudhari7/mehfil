@@ -16,9 +16,19 @@ import { scriptFont, type Script } from "@/lib/fonts";
 import { Vinyl } from "@/components/ui";
 import { artistLine, usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useNowPlaying } from "@/lib/useNowPlaying";
+import { useEraStore } from "@/lib/useEraStore";
+import type { EraId } from "@/lib/eras";
 import { useSoundStore } from "@/lib/sound/useSoundStore";
-import { playNeedleDrop, startCrackle, stopCrackle } from "@/lib/sound/sfx";
+import { playNeedleDrop, setAmbience, stopAmbience, type AmbienceKind } from "@/lib/sound/sfx";
 import { Scrubber } from "./Scrubber";
+
+const ERA_AMBIENCE: Record<EraId, AmbienceKind> = {
+  "50s": "shellac",
+  "60s": "vinyl",
+  "70s": "vinylWarm",
+  "80s": "tape",
+  "90s": "cd",
+};
 
 const LANG: Record<Script, string> = {
   devanagari: "hi",
@@ -74,6 +84,7 @@ export function PlayerBar() {
   const setVolume = usePlayerStore((s) => s.setVolume);
   const togglePlay = usePlayerStore((s) => s.togglePlay);
   const openNowPlaying = useNowPlaying((s) => s.setOpen);
+  const era = useEraStore((s) => s.era);
 
   const muted = useSoundStore((s) => s.muted);
   const unlocked = useSoundStore((s) => s.unlocked);
@@ -86,11 +97,12 @@ export function PlayerBar() {
     hydrate();
   }, [hydrate]);
 
-  // Crackle ambience follows playback; sfx self-gates on unlocked && !muted.
+  // Era-appropriate ambient bed follows playback + the current zone; sfx self-gates
+  // on unlocked && !muted (shellac crackle → vinyl noise → warm hiss → tape → CD).
   useEffect(() => {
-    if (status === "playing") startCrackle();
-    else stopCrackle();
-  }, [status, muted, unlocked]);
+    if (status === "playing") setAmbience(ERA_AMBIENCE[era]);
+    else stopAmbience();
+  }, [status, era, muted, unlocked]);
 
   if (!track) return null;
 

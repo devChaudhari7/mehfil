@@ -88,29 +88,142 @@ export function buildCrackle(): string {
   return samplesToWavDataUri(s);
 }
 
+/** Heavy shellac crackle (50s): denser, louder pops over a hiss bed. */
+export function buildShellacCrackle(): string {
+  const dur = 2.4;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) s[i] = (Math.random() * 2 - 1) * 0.022;
+  const pops = 170;
+  for (let p = 0; p < pops; p++) {
+    const at = Math.floor(Math.random() * n);
+    const amp = 0.25 + Math.random() * 0.55;
+    const len = 30 + Math.floor(Math.random() * 70);
+    for (let j = 0; j < len && at + j < n; j++) {
+      s[at + j] = (s[at + j] ?? 0) + (Math.random() * 2 - 1) * amp * Math.exp(-j / 11);
+    }
+  }
+  for (let i = 0; i < n; i++) s[i] = clamp(s[i] ?? 0);
+  return samplesToWavDataUri(s);
+}
+
+/** Warm vinyl hiss (70s): a low-passed (warmer) noise bed with sparse soft pops. */
+export function buildVinylWarmHiss(): string {
+  const dur = 2.2;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) s[i] = (Math.random() * 2 - 1) * 0.03;
+  const pops = 36;
+  for (let p = 0; p < pops; p++) {
+    const at = Math.floor(Math.random() * n);
+    const amp = 0.08 + Math.random() * 0.22;
+    for (let j = 0; j < 28 && at + j < n; j++) {
+      s[at + j] = (s[at + j] ?? 0) + (Math.random() * 2 - 1) * amp * Math.exp(-j / 12);
+    }
+  }
+  // one-pole low-pass for "warmth"
+  let prev = 0;
+  for (let i = 0; i < n; i++) {
+    prev += 0.22 * ((s[i] ?? 0) - prev);
+    s[i] = clamp(prev * 1.6);
+  }
+  return samplesToWavDataUri(s);
+}
+
+/** Tape hiss (80s): steady high hiss with a slow wow/flutter amplitude wobble. */
+export function buildTapeHiss(): string {
+  const dur = 2.2;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    const wobble = 0.82 + 0.18 * Math.sin(2 * Math.PI * 1.3 * t + Math.sin(t * 0.7));
+    s[i] = clamp((Math.random() * 2 - 1) * 0.032 * wobble);
+  }
+  return samplesToWavDataUri(s);
+}
+
+/** CD near-silence (90s): a whisper of digital-floor hiss. */
+export function buildCdSilence(): string {
+  const dur = 2.2;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) s[i] = clamp((Math.random() * 2 - 1) * 0.004);
+  return samplesToWavDataUri(s);
+}
+
+/** Mechanical cassette-door clunk: a thud + two contact clicks. */
+export function buildCassetteClunk(): string {
+  const dur = 0.3;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    const thud = Math.sin(2 * Math.PI * 105 * t) * Math.exp(-t * 26) * 0.5;
+    const body = Math.sin(2 * Math.PI * 190 * t) * Math.exp(-t * 38) * 0.18;
+    const click1 = t < 0.006 ? (Math.random() * 2 - 1) * (1 - t / 0.006) * 0.5 : 0;
+    const click2 = t > 0.085 && t < 0.097 ? (Math.random() * 2 - 1) * 0.4 : 0;
+    s[i] = clamp(thud + body + click1 + click2);
+  }
+  return samplesToWavDataUri(s);
+}
+
 // --- runtime SFX manager -------------------------------------------------
 
+/** Era-appropriate ambient bed (shellac crackle → vinyl noise → warm hiss → tape
+ *  hiss → CD near-silence). Driven by the current era zone while a track plays. */
+export type AmbienceKind = "shellac" | "vinyl" | "vinylWarm" | "tape" | "cd";
+
+const BED_BUILD: Record<AmbienceKind, () => string> = {
+  shellac: buildShellacCrackle,
+  vinyl: buildCrackle,
+  vinylWarm: buildVinylWarmHiss,
+  tape: buildTapeHiss,
+  cd: buildCdSilence,
+};
+const BED_VOLUME: Record<AmbienceKind, number> = {
+  shellac: 0.24,
+  vinyl: 0.18,
+  vinylWarm: 0.16,
+  tape: 0.2,
+  cd: 0.06,
+};
+
 let needleUri: string | null = null;
-let crackleUri: string | null = null;
+let clunkUri: string | null = null;
 let needle: Howl | null = null;
-let crackle: Howl | null = null;
+let clunk: Howl | null = null;
+const bedHowls: Partial<Record<AmbienceKind, Howl>> = {};
+let currentBed: AmbienceKind | null = null;
 let unlocked = false;
 let muted = false;
 
-function ensureHowls(): void {
+function ensureNeedle(): void {
   needleUri ??= buildNeedleDrop();
-  crackleUri ??= buildCrackle();
   needle ??= new Howl({ src: [needleUri], format: ["wav"], volume: 0.7 });
-  crackle ??= new Howl({ src: [crackleUri], format: ["wav"], loop: true, volume: 0.22 });
+}
+function ensureClunk(): void {
+  clunkUri ??= buildCassetteClunk();
+  clunk ??= new Howl({ src: [clunkUri], format: ["wav"], volume: 0.55 });
+}
+function ensureBed(kind: AmbienceKind): Howl {
+  let h = bedHowls[kind];
+  if (!h) {
+    h = new Howl({ src: [BED_BUILD[kind]()], format: ["wav"], loop: true, volume: BED_VOLUME[kind] });
+    bedHowls[kind] = h;
+  }
+  return h;
 }
 
-/** Call inside the first user gesture: resume the audio context + prime Howls. */
+/** Call inside the first user gesture: resume the audio context + prime SFX. */
 export function unlockAudio(): void {
   unlocked = true;
   try {
     const ctx = Howler.ctx;
     if (ctx && ctx.state !== "running") void ctx.resume();
-    ensureHowls();
+    ensureNeedle();
+    // resume any ambience requested before the gesture unlocked audio
+    if (currentBed && !muted) ensureBed(currentBed).play();
   } catch {
     /* audio unavailable — non-fatal */
   }
@@ -119,28 +232,54 @@ export function unlockAudio(): void {
 export function playNeedleDrop(): void {
   if (!unlocked || muted) return;
   try {
-    ensureHowls();
+    ensureNeedle();
     needle?.play();
   } catch {
     /* non-fatal */
   }
 }
 
-export function startCrackle(): void {
+/** Mechanical cassette-door clunk (Now Playing deck open / cassette transition). */
+export function playCassetteClunk(): void {
   if (!unlocked || muted) return;
   try {
-    ensureHowls();
-    if (crackle && !crackle.playing()) crackle.play();
+    ensureClunk();
+    clunk?.play();
   } catch {
     /* non-fatal */
   }
 }
 
-export function stopCrackle(): void {
+/** Crossfade the looping ambient bed to an era kind (null = silence). Remembers the
+ *  request even before unlock / while muted, so unlock + unmute can resume it. */
+export function setAmbience(kind: AmbienceKind | null): void {
+  for (const [k, h] of Object.entries(bedHowls)) {
+    if (k !== kind) {
+      try {
+        h?.stop();
+      } catch {
+        /* non-fatal */
+      }
+    }
+  }
+  currentBed = kind;
+  if (!kind || !unlocked || muted) return;
   try {
-    crackle?.stop();
+    const h = ensureBed(kind);
+    if (!h.playing()) h.play();
   } catch {
     /* non-fatal */
+  }
+}
+
+export function stopAmbience(): void {
+  currentBed = null;
+  for (const h of Object.values(bedHowls)) {
+    try {
+      h?.stop();
+    } catch {
+      /* non-fatal */
+    }
   }
 }
 
@@ -148,7 +287,17 @@ export function applyMuted(value: boolean): void {
   muted = value;
   try {
     Howler.mute(value);
-    if (value) stopCrackle();
+    if (value) {
+      for (const h of Object.values(bedHowls)) {
+        try {
+          h?.stop();
+        } catch {
+          /* non-fatal */
+        }
+      }
+    } else if (currentBed && unlocked) {
+      ensureBed(currentBed).play();
+    }
   } catch {
     /* non-fatal */
   }
