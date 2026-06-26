@@ -55,7 +55,7 @@ function FacetRow({
   return (
     <section aria-label={`Browse by ${label}`}>
       <Mono className="text-ink/50">{label}</Mono>
-      <div className="mt-3 flex flex-wrap gap-2.5">{children}</div>
+      <div className="stagger-grid mt-3 flex flex-wrap gap-2.5">{children}</div>
     </section>
   );
 }

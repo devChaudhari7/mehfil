@@ -63,7 +63,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
         {releases.length > 0 && (
           <section aria-label="Films">
             <Heading level={2}>Films</Heading>
-            <div className="mt-6 flex flex-wrap justify-center gap-6">
+            <div className="stagger-grid mt-6 flex flex-wrap justify-center gap-6">
               {releases.map((r) => (
                 <ReleaseCard key={r.id} release={r} />
               ))}

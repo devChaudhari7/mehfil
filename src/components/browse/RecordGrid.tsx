@@ -19,7 +19,10 @@ export function RecordGrid({
   className?: string;
 }) {
   return (
-    <ul aria-label={label} className={cx("flex flex-wrap justify-center gap-x-6 gap-y-9", className)}>
+    <ul
+      aria-label={label}
+      className={cx("stagger-grid flex flex-wrap justify-center gap-x-6 gap-y-9", className)}
+    >
       {tracks.map((t) => (
         <TrackCard key={t.id} track={t} queue={tracks} />
       ))}
