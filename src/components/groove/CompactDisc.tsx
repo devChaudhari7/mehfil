@@ -27,7 +27,7 @@ export function CompactDisc({ spinning = false, size = 300, className }: Compact
         background:
           "conic-gradient(from 0deg, #b9c7d6, #e7d6f0, #cfe9ee, #d6c0e0, #c0d8e6, #e7d6f0, #b9c7d6)",
         boxShadow: "0 30px 70px rgba(0,0,0,0.5), inset 0 0 50px rgba(255,255,255,0.22)",
-        animation: animate ? "vinyl-spin 1.4s linear infinite" : undefined,
+        animation: animate ? "vinyl-spin var(--spin-cd) linear infinite" : undefined,
       }}
       role="img"
       aria-label="Compact disc"

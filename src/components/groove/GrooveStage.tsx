@@ -70,11 +70,14 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
     void import("gsap").then(({ gsap }) => {
       if (reverted || !rootRef.current) return;
       ctx = gsap.context(() => {
+        // Match the shared scale: --dur-3 (0.36s) + the rise-in distance (10px),
+        // staggered ~--stagger-step. power2.out is the entrance-settle character
+        // (≈ --ease-out), not the mechanical press curve.
         gsap.from("[data-intro]", {
           opacity: 0,
-          y: 18,
-          duration: 0.7,
-          stagger: 0.09,
+          y: 10,
+          duration: 0.36,
+          stagger: 0.05,
           ease: "power2.out",
         });
       }, rootRef);

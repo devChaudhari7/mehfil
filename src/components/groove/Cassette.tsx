@@ -93,7 +93,8 @@ export function Cassette({
   const geom = variant === "deck" ? DECK_GEOM : DEFAULT_GEOM;
 
   // CSS spin only in the hero (no clock) path; the deck drives rotation via rAF.
-  const reelAnim = spinning && !reduced && !clock ? "vinyl-spin 2.4s linear infinite" : undefined;
+  const reelAnim =
+    spinning && !reduced && !clock ? "vinyl-spin var(--spin-cass) linear infinite" : undefined;
 
   useEffect(() => {
     if (!clock || reduced) return;

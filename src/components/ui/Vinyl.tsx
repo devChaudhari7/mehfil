@@ -39,7 +39,7 @@ export function Vinyl({ spinning = false, size = 260, label, className }: VinylP
           background:
             "repeating-radial-gradient(circle at 50% 50%, var(--disc) 0 3px, var(--disc2) 3px 5px)",
           boxShadow: "0 30px 70px rgba(0,0,0,0.55), inset 0 0 60px rgba(0,0,0,0.6)",
-          animation: animate ? "vinyl-spin 1.8s linear infinite" : undefined,
+          animation: animate ? "vinyl-spin var(--spin-vinyl) linear infinite" : undefined,
         }}
       >
         {/* diagonal sheen / light sweep */}
