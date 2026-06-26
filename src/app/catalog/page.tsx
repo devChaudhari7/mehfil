@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   catalogRepository,
   countsByEra,
@@ -12,6 +11,7 @@ import {
 import { Heading, Mono, NativeText } from "@/components/ui";
 import { BrowseShell } from "@/components/browse";
 import { RecordArt } from "@/components/art";
+import { GrooveLink } from "@/components/GrooveLink";
 import { CatalogPlayButton } from "@/components/player/CatalogPlayButton";
 
 /*
@@ -35,13 +35,13 @@ const REGION_LABEL: Record<string, string> = { india: "India", west: "The West" 
 
 function Facet({ href, label, count }: { href: string; label: string; count: number }) {
   return (
-    <Link
+    <GrooveLink
       href={href}
       className="hover:border-accent/50 group flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 transition-colors hover:bg-white/5"
     >
       <span className="text-ink font-body text-sm">{label}</span>
       <span className="text-ink/45 font-mono text-[11px] tabular-nums">{count}</span>
-    </Link>
+    </GrooveLink>
   );
 }
 

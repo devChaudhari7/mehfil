@@ -7,8 +7,8 @@
  * `onSelect` lets the ⌘K palette close after a choice.
  */
 import type { ComponentType } from "react";
-import Link from "next/link";
 import { Disc3, Music2, User } from "lucide-react";
+import { GrooveLink } from "@/components/GrooveLink";
 import { totalCount, type GroupedResults } from "@/lib/search";
 import { scriptForLanguage } from "@/lib/fonts";
 import { NativeText } from "@/components/ui";
@@ -93,8 +93,9 @@ export function SearchResults({
           <ul className="mt-3 divide-y divide-white/10">
             {results.albums.map((r) => (
               <li key={r.id}>
-                <Link
+                <GrooveLink
                   href={`/album/${r.id}`}
+                  intent="journey"
                   onClick={onSelect}
                   className="hover:text-accent flex items-center justify-between gap-3 rounded-md px-2 py-2.5 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/[0.03]"
                 >
@@ -102,7 +103,7 @@ export function SearchResults({
                   <span className="text-ink/50 shrink-0 font-mono text-[11px] tabular-nums">
                     {r.release.year}
                   </span>
-                </Link>
+                </GrooveLink>
               </li>
             ))}
           </ul>
@@ -115,7 +116,7 @@ export function SearchResults({
           <ul className="mt-3 divide-y divide-white/10">
             {results.artists.map((r) => (
               <li key={r.id}>
-                <Link
+                <GrooveLink
                   href={`/artist/${r.id}`}
                   onClick={onSelect}
                   className="hover:text-accent block rounded-md px-2 py-2.5 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/[0.03]"
@@ -130,7 +131,7 @@ export function SearchResults({
                   ) : (
                     <span className="font-display">{r.artist.name.latin}</span>
                   )}
-                </Link>
+                </GrooveLink>
               </li>
             ))}
           </ul>
