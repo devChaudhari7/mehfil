@@ -125,5 +125,5 @@ html {
   }
 }
 .overlay-fade {
-  animation: overlay-fade 0.3s ease both;
+  animation: overlay-fade var(--dur-3) var(--ease-out) both;
 }
