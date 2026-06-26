@@ -41,9 +41,11 @@ export function AlbumHero({ release, rpm }: { release: Release; rpm: string }) {
       style={{ height: "min(86vw, 360px)" }}
     >
       {size > 0 && (
-        <RecordSleeve size={size} pullRoom={PULL_ROOM} label={rpm} spinning={spinning} bleed>
-          <RecordArt subject={{ release }} size="lg" variant="sleeve" decorativeTitle />
-        </RecordSleeve>
+        <div style={{ viewTransitionName: "groove-record" }}>
+          <RecordSleeve size={size} pullRoom={PULL_ROOM} label={rpm} spinning={spinning} bleed>
+            <RecordArt subject={{ release }} size="lg" variant="sleeve" decorativeTitle />
+          </RecordSleeve>
+        </div>
       )}
     </div>
   );

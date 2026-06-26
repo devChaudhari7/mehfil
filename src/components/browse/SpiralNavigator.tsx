@@ -299,6 +299,22 @@ export function SpiralNavigator() {
             />
           </svg>
 
+          {/* central hub disc — you're standing inside the record. Also the
+              shared-element target the home/album record morphs into (Phase 12). */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "34%",
+              aspectRatio: "1",
+              viewTransitionName: "groove-record",
+              background:
+                "repeating-radial-gradient(circle at 50% 50%, var(--disc) 0 3px, var(--disc2) 3px 5px)",
+              boxShadow: "inset 0 0 40px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4)",
+              opacity: 0.55,
+            }}
+          />
+
           {/* center hub: the focused node + its action */}
           <div className="pointer-events-none absolute inset-0 grid place-items-center">
             <div className="max-w-[44%] text-center">

@@ -198,6 +198,7 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
               aria-hidden="true"
               tabIndex={-1}
               className="groove-zoom relative z-10 block cursor-pointer"
+              style={{ viewTransitionName: "groove-record" }}
             >
               <MediumArtifact
                 era={era}
