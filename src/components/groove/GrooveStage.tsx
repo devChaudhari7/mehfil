@@ -144,7 +144,7 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
     <section
       ref={rootRef}
       aria-label="The Groove"
-      className="relative grid min-h-[100svh] w-full place-items-center overflow-hidden px-5 pt-20 pb-28 sm:pb-32"
+      className="groove-stage relative grid min-h-[100svh] w-full place-items-center overflow-hidden px-5 pt-20 pb-28 sm:pb-32"
     >
       {/* Decorative backdrop (dynamic; absolute → CLS-safe to defer) */}
       <GrooveScene tier={tier} clock={clock} amplitude={amplitude} />
@@ -195,6 +195,7 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
             <GrooveLink
               href="/browse"
               intent="journey"
+              windup
               aria-hidden="true"
               tabIndex={-1}
               className="groove-zoom relative z-10 block cursor-pointer"

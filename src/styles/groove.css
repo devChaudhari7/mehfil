@@ -232,6 +232,20 @@ html {
   animation: cta-breathe 3.4s var(--ease-out) infinite;
 }
 
+/* Home ENTER wind-up (Phase 12): a brief "camera push-in" before the journey
+ * morph, driven by html[data-entering] (set by enterGroove). Reduced motion zeroes
+ * the transition globally + the controller skips the wind-up entirely. */
+.groove-stage {
+  transform-origin: 50% 44%;
+  transition:
+    transform var(--dur-3) var(--ease-analog),
+    filter var(--dur-3) var(--ease-out);
+}
+html[data-entering] .groove-stage {
+  transform: scale(1.06);
+  filter: brightness(1.06);
+}
+
 /* ------------------------------------------------------------------ *
  * View Transitions (Phase 12) — one mechanism, three art-directed
  * intents selected by `data-vt` on <html> (set by useGrooveTransition).

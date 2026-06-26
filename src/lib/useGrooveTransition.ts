@@ -23,6 +23,7 @@
 import { startTransition, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { playEnterGroove } from "@/lib/sound/sfx";
 
 export type Intent = "journey" | "veil" | "crossfade";
 
@@ -48,10 +49,9 @@ export function intentFor(href: string): Intent {
   return "crossfade";
 }
 
-/** Optional per-intent sound hook, wired up by GrooveTransitionRoot (Phase 12 C3/C4). */
-let sound: ((intent: Intent) => void) | null = null;
-export function setTransitionSound(fn: ((intent: Intent) => void) | null): void {
-  sound = fn;
+function viewTransition(): ((cb: () => void | Promise<void>) => { finished: Promise<void> }) | null {
+  const d = typeof document !== "undefined" ? (document as VTDocument) : null;
+  return d?.startViewTransition?.bind(d) ?? null;
 }
 
 /** Travel to an internal route through the View Transition (or plain push). */
@@ -62,13 +62,11 @@ export function travel(href: string, intent?: Intent): void {
     return;
   }
   const i = intent ?? intentFor(href);
-  const d = typeof document !== "undefined" ? (document as VTDocument) : null;
-  const start = d?.startViewTransition?.bind(d);
+  const start = viewTransition();
   if (c.reduced || !start) {
     c.push(href);
     return;
   }
-  sound?.(i);
   document.documentElement.dataset.vt = i;
   const vt = start(
     () =>
@@ -89,6 +87,33 @@ export function travel(href: string, intent?: Intent): void {
       if (document.documentElement.dataset.vt === i) delete document.documentElement.dataset.vt;
     })
     .catch(() => {});
+}
+
+/**
+ * The signature home ENTER ("enter inside the record"): a brief physical wind-up —
+ * the needle-lift/scratch/bass-swell sound + a camera push-in (html[data-entering])
+ * — then the journey View Transition morphs the record into the spiral. Degrades to
+ * a plain push (silent, no wind-up) under reduced-motion / no VT.
+ */
+export function enterGroove(href = "/browse"): void {
+  const c = controller;
+  if (!c) {
+    if (typeof window !== "undefined") window.location.assign(href);
+    return;
+  }
+  if (c.reduced || !viewTransition()) {
+    c.push(href);
+    return;
+  }
+  playEnterGroove();
+  const root = document.documentElement;
+  root.dataset.entering = "1";
+  window.setTimeout(() => {
+    travel(href, "journey");
+    window.setTimeout(() => {
+      delete root.dataset.entering;
+    }, 700);
+  }, 340);
 }
 
 /** Mounted once in World: keeps the controller fresh + resolves the VT on commit. */

@@ -9,11 +9,15 @@
  */
 import Link from "next/link";
 import type { ComponentProps, MouseEvent } from "react";
-import { travel, type Intent } from "@/lib/useGrooveTransition";
+import { enterGroove, travel, type Intent } from "@/lib/useGrooveTransition";
 
-type GrooveLinkProps = ComponentProps<typeof Link> & { intent?: Intent };
+type GrooveLinkProps = ComponentProps<typeof Link> & {
+  intent?: Intent;
+  /** The signature home ENTER: wind-up (sound + camera push) then the journey morph. */
+  windup?: boolean;
+};
 
-export function GrooveLink({ intent, onClick, ...props }: GrooveLinkProps) {
+export function GrooveLink({ intent, windup, onClick, ...props }: GrooveLinkProps) {
   function handleClick(e: MouseEvent<HTMLAnchorElement>) {
     onClick?.(e);
     if (e.defaultPrevented) return;
@@ -22,7 +26,8 @@ export function GrooveLink({ intent, onClick, ...props }: GrooveLinkProps) {
     if (props.target && props.target !== "_self") return;
     if (typeof props.href !== "string" || !props.href.startsWith("/")) return;
     e.preventDefault();
-    travel(props.href, intent);
+    if (windup) enterGroove(props.href);
+    else travel(props.href, intent);
   }
   return <Link {...props} onClick={handleClick} />;
 }

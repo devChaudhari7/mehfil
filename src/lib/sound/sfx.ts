@@ -168,6 +168,51 @@ export function buildCassetteClunk(): string {
   return samplesToWavDataUri(s);
 }
 
+/** Enter-the-groove cue (Phase 12): needle-lift tick → soft vinyl scratch → a low
+ *  bass swell. The signature sound of diving into the record. Tiny, Apple-quiet. */
+export function buildEnterGroove(): string {
+  const dur = 0.95;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    // 1) needle-lift contact tick
+    const tick = t < 0.01 ? (Math.random() * 2 - 1) * (1 - t / 0.01) * 0.32 : 0;
+    // 2) soft vinyl scratch — a brief shaped noise zip
+    let scratch = 0;
+    if (t > 0.02 && t < 0.18) {
+      const u = (t - 0.02) / 0.16;
+      scratch = (Math.random() * 2 - 1) * Math.sin(Math.PI * u) * 0.11;
+    }
+    // 3) low bass swell — sub sine rising to ~0.7s, gentle tail
+    const ramp = Math.min(t / 0.7, 1);
+    const env = Math.pow(ramp, 1.6) * Math.exp(-Math.max(t - 0.7, 0) * 2.2);
+    const freq = 50 + 10 * ramp; // 50 → 60 Hz
+    const bass = Math.sin(2 * Math.PI * freq * t) * env * 0.6;
+    const sub = Math.sin(2 * Math.PI * (freq / 2) * t) * env * 0.2;
+    s[i] = clamp(tick + scratch + bass + sub);
+  }
+  return samplesToWavDataUri(s);
+}
+
+/** Era-change veil whoosh (Phase 12): a soft, low-passed swell — barely there. */
+export function buildVeilWhoosh(): string {
+  const dur = 0.6;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    const env = Math.sin(Math.PI * Math.min(t / dur, 1)); // swell in/out
+    s[i] = (Math.random() * 2 - 1) * 0.18 * env;
+  }
+  let prev = 0;
+  for (let i = 0; i < n; i++) {
+    prev += 0.06 * ((s[i] ?? 0) - prev); // heavy low-pass → a low whoosh
+    s[i] = clamp(prev * 2.4);
+  }
+  return samplesToWavDataUri(s);
+}
+
 // --- runtime SFX manager -------------------------------------------------
 
 /** Era-appropriate ambient bed (shellac crackle → vinyl noise → warm hiss → tape
@@ -191,8 +236,12 @@ const BED_VOLUME: Record<AmbienceKind, number> = {
 
 let needleUri: string | null = null;
 let clunkUri: string | null = null;
+let enterUri: string | null = null;
+let veilUri: string | null = null;
 let needle: Howl | null = null;
 let clunk: Howl | null = null;
+let enter: Howl | null = null;
+let veil: Howl | null = null;
 const bedHowls: Partial<Record<AmbienceKind, Howl>> = {};
 let currentBed: AmbienceKind | null = null;
 let unlocked = false;
@@ -205,6 +254,14 @@ function ensureNeedle(): void {
 function ensureClunk(): void {
   clunkUri ??= buildCassetteClunk();
   clunk ??= new Howl({ src: [clunkUri], format: ["wav"], volume: 0.55 });
+}
+function ensureEnter(): void {
+  enterUri ??= buildEnterGroove();
+  enter ??= new Howl({ src: [enterUri], format: ["wav"], volume: 0.5 });
+}
+function ensureVeil(): void {
+  veilUri ??= buildVeilWhoosh();
+  veil ??= new Howl({ src: [veilUri], format: ["wav"], volume: 0.3 });
 }
 function ensureBed(kind: AmbienceKind): Howl {
   let h = bedHowls[kind];
@@ -234,6 +291,31 @@ export function playNeedleDrop(): void {
   try {
     ensureNeedle();
     needle?.play();
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Enter-the-groove cue — fired on the home ENTER (a user gesture, so it also
+ *  unlocks audio if this is the first sound). Honors the global mute. */
+export function playEnterGroove(): void {
+  if (!unlocked) unlockAudio();
+  if (muted) return;
+  try {
+    ensureEnter();
+    enter?.play();
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Soft veil whoosh — fired sparingly on era changes. */
+export function playVeilTick(): void {
+  if (!unlocked) unlockAudio();
+  if (muted) return;
+  try {
+    ensureVeil();
+    veil?.play();
   } catch {
     /* non-fatal */
   }
