@@ -20,8 +20,8 @@
  * in a CSS-reserved box (no CLS); the wordmark is the preloaded Marcellus (LCP).
  */
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { GrooveLink } from "@/components/GrooveLink";
 import { getEra, type EraId } from "@/lib/eras";
 import { useEraStore } from "@/lib/useEraStore";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
@@ -151,18 +151,18 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
 
       {/* Quiet secondary — utility relocated off the focal path */}
       <nav className="absolute top-5 right-5 z-20 flex items-center gap-4 font-mono text-[11px] tracking-[0.18em] uppercase">
-        <Link
+        <GrooveLink
           href="/catalog"
           className="text-ink/55 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
         >
           The Library
-        </Link>
-        <Link
+        </GrooveLink>
+        <GrooveLink
           href="/search"
           className="text-ink/55 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
         >
           Search
-        </Link>
+        </GrooveLink>
       </nav>
 
       {/* The stage: kicker · the title-eclipsing record · era caption · thesis + ENTER */}
@@ -192,8 +192,9 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
 
           {/* the record (in front, eclipsing the title) — also a click target in */}
           {tier !== "A" && size > 0 && (
-            <Link
+            <GrooveLink
               href="/browse"
+              intent="journey"
               aria-hidden="true"
               tabIndex={-1}
               className="groove-zoom relative z-10 block cursor-pointer"
@@ -206,7 +207,7 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
                 clock={clock}
                 size={size}
               />
-            </Link>
+            </GrooveLink>
           )}
         </div>
 

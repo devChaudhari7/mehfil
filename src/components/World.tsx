@@ -3,6 +3,7 @@ import { GrainOverlay } from "@/components/GrainOverlay";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { NowPlayingOverlay } from "@/components/player/NowPlayingOverlay";
 import { SearchPalette } from "@/components/search/SearchPalette";
+import { GrooveTransitionRoot } from "@/lib/useGrooveTransition";
 
 /*
  * World — the persistent stage every route lives inside. Lays the analog
@@ -33,6 +34,7 @@ export function World({ children }: { children: ReactNode }) {
       <PlayerBar />
       <NowPlayingOverlay />
       <SearchPalette />
+      <GrooveTransitionRoot />
     </>
   );
 }

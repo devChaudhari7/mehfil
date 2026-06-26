@@ -4,8 +4,8 @@
  * header slot, and the page body. Each routed page is itself the accessible "list"
  * parallel to the spiral, so the nav always offers the way back to the groove.
  */
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { GrooveLink } from "@/components/GrooveLink";
 
 export function BrowseShell({
   header,
@@ -17,28 +17,28 @@ export function BrowseShell({
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-12 sm:py-16">
       <nav className="mb-10 flex items-center justify-between font-mono text-[11px] tracking-[0.18em] uppercase">
-        <Link href="/" className="text-ink/60 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline">
+        <GrooveLink href="/" className="text-ink/60 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline">
           ← MEHFIL
-        </Link>
+        </GrooveLink>
         <div className="flex items-center gap-5">
-          <Link
+          <GrooveLink
             href="/catalog"
             className="text-ink/60 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
           >
             Library
-          </Link>
-          <Link
+          </GrooveLink>
+          <GrooveLink
             href="/search"
             className="text-ink/60 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
           >
             Search
-          </Link>
-          <Link
+          </GrooveLink>
+          <GrooveLink
             href="/browse"
             className="text-ink/60 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
           >
             Travel the groove →
-          </Link>
+          </GrooveLink>
         </div>
       </nav>
       <header className="max-w-2xl">{header}</header>

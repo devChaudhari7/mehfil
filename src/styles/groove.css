@@ -231,3 +231,82 @@ html {
 .cta-breathe {
   animation: cta-breathe 3.4s var(--ease-out) infinite;
 }
+
+/* ------------------------------------------------------------------ *
+ * View Transitions (Phase 12) — one mechanism, three art-directed
+ * intents selected by `data-vt` on <html> (set by useGrooveTransition).
+ * While a VT runs, suppress the legacy route-enter to avoid double-
+ * animating; route-enter remains the fallback for non-VT browsers.
+ * Reduced motion never reaches here (the controller skips VT in JS).
+ * ------------------------------------------------------------------ */
+html[data-vt] .route-enter {
+  animation: none;
+}
+
+/* crossfade (utility) — near-invisible: a short opacity + tiny blur. */
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+html[data-vt="crossfade"]::view-transition-old(root) {
+  animation: vt-fade-out var(--dur-xfade) var(--ease-out) both;
+}
+html[data-vt="crossfade"]::view-transition-new(root) {
+  animation: vt-fade-in var(--dur-xfade) var(--ease-out) both;
+}
+
+/* journey — the record is the protagonist: the shared `groove-record`
+ * element morphs old→new while the camera settles (incoming root eases
+ * down from a slight push-in). Weighted easing → a physical object. */
+@keyframes vt-journey-in {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+html[data-vt="journey"]::view-transition-old(root) {
+  animation: vt-fade-out 0.42s var(--ease-out) both;
+}
+html[data-vt="journey"]::view-transition-new(root) {
+  animation: vt-journey-in 0.52s var(--ease-analog) both;
+}
+::view-transition-group(groove-record) {
+  animation-duration: 0.52s;
+  animation-timing-function: var(--ease-analog);
+}
+
+/* veil — reserved for era changes: a groove-iris wipe (old contracts to
+ * center, new era expands from it). */
+@keyframes vt-iris-out {
+  to {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 0.55;
+  }
+}
+@keyframes vt-iris-in {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+  to {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+html[data-vt="veil"]::view-transition-old(root) {
+  animation: vt-iris-out var(--dur-4) var(--ease-analog) both;
+}
+html[data-vt="veil"]::view-transition-new(root) {
+  animation: vt-iris-in var(--dur-4) var(--ease-analog) both;
+  z-index: 1;
+}

@@ -5,7 +5,7 @@
  * journey is a client enhancement layered on top by GrooveStage; this is the
  * accessible floor.
  */
-import Link from "next/link";
+import { GrooveLink } from "@/components/GrooveLink";
 
 export function HeroNav() {
   return (
@@ -16,12 +16,13 @@ export function HeroNav() {
       >
         Don&rsquo;t scroll the library. Travel the groove.
       </p>
-      <Link
+      <GrooveLink
         href="/browse"
+        intent="journey"
         className="cta-breathe bg-btn text-btn-ink rounded-full px-7 py-3 font-mono text-xs tracking-[0.22em] uppercase transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)] hover:brightness-110 active:translate-y-[2px]"
       >
         Enter the groove →
-      </Link>
+      </GrooveLink>
     </div>
   );
 }
