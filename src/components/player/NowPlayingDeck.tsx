@@ -44,9 +44,9 @@ function DeckButton({
       aria-label={label}
       onClick={onClick}
       className={cx(
-        "grid shrink-0 cursor-pointer place-items-center rounded-full transition-[transform,filter,background-color] duration-150 ease-[var(--ease-analog)] active:translate-y-[1px]",
+        "grid shrink-0 cursor-pointer place-items-center rounded-full transition-[transform,filter,background-color,box-shadow] duration-[var(--dur-1)] ease-[var(--ease-analog)] active:translate-y-[1px]",
         primary
-          ? "bg-btn text-btn-ink h-14 w-14 shadow-[0_3px_0_rgba(0,0,0,0.35),0_6px_14px_rgba(0,0,0,0.35)] hover:brightness-110"
+          ? "bg-btn text-btn-ink h-14 w-14 shadow-[0_3px_0_rgba(0,0,0,0.35),0_6px_14px_rgba(0,0,0,0.35)] hover:brightness-110 active:shadow-[0_1px_0_rgba(0,0,0,0.35)]"
           : "text-ink h-11 w-11 hover:bg-white/10",
       )}
     >
@@ -106,7 +106,7 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
       type="button"
       aria-label="Close now playing"
       onClick={onClose}
-      className="text-ink/70 hover:text-ink grid h-11 w-11 cursor-pointer place-items-center rounded-full hover:bg-white/10"
+      className="text-ink/70 hover:text-ink grid h-11 w-11 cursor-pointer place-items-center rounded-full transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/10"
     >
       <X size={22} />
     </button>
@@ -114,7 +114,7 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
     <Link
       href={backHref}
       aria-label="Back"
-      className="text-ink/70 hover:text-ink grid h-11 w-11 place-items-center rounded-full hover:bg-white/10"
+      className="text-ink/70 hover:text-ink grid h-11 w-11 place-items-center rounded-full transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/10"
     >
       <X size={22} />
     </Link>

@@ -102,6 +102,7 @@ export function Dial({
           <span
             className={cx(
               "absolute -translate-x-1/2 -translate-y-1/2 rounded-full",
+              "transition-[width,height,box-shadow,background-color] duration-[var(--dur-1)] ease-[var(--ease-out)]",
               i === value
                 ? "bg-glow"
                 : "bg-[color-mix(in_srgb,var(--ink)_45%,transparent)]",
@@ -122,7 +123,7 @@ export function Dial({
         className="absolute top-1/2 left-1/2"
         style={{
           transform: `rotate(${angleFor(value)}deg)`,
-          transition: reduced ? undefined : "transform 0.5s var(--ease-analog)",
+          transition: reduced ? undefined : "transform var(--dur-4) var(--ease-analog)",
         }}
       >
         <span

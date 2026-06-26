@@ -53,7 +53,7 @@ export function PlayControl({ track, queue, variant = "pill", onActivate, classN
         aria-label={label}
         title={playable ? (isPlaying ? "Pause" : "Play") : "No source yet — run a live ingest"}
         className={cx(
-          "grid h-10 w-10 place-items-center rounded-full transition-[filter,transform] duration-150",
+          "grid h-10 w-10 place-items-center rounded-full transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)]",
           playable
             ? "bg-btn text-btn-ink cursor-pointer hover:brightness-110 active:translate-y-[1px]"
             : "text-ink/30 cursor-not-allowed border border-white/10",
@@ -73,7 +73,7 @@ export function PlayControl({ track, queue, variant = "pill", onActivate, classN
       aria-label={label}
       title={playable ? (isPlaying ? "Pause" : "Play") : "No source yet — run a live ingest"}
       className={cx(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-xs tracking-wide transition-[filter,transform] duration-150",
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-xs tracking-wide transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)]",
         playable
           ? "bg-btn text-btn-ink cursor-pointer hover:brightness-110 active:translate-y-[1px]"
           : "text-ink/30 cursor-not-allowed border border-white/10",

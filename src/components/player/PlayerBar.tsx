@@ -60,7 +60,7 @@ function IconButton({
       onClick={onClick}
       className={cx(
         "grid shrink-0 cursor-pointer place-items-center rounded-full",
-        "transition-[transform,background-color,filter] duration-150 ease-[var(--ease-analog)]",
+        "transition-[transform,background-color,filter] duration-[var(--dur-1)] ease-[var(--ease-analog)]",
         "active:translate-y-[1px]",
         primary
           ? "bg-btn text-btn-ink h-12 w-12 shadow-[0_3px_0_rgba(0,0,0,0.35),0_6px_14px_rgba(0,0,0,0.35)] hover:brightness-110 active:shadow-[0_1px_0_rgba(0,0,0,0.35)]"
@@ -132,7 +132,7 @@ export function PlayerBar() {
           type="button"
           onClick={() => openNowPlaying(true)}
           aria-label="Open now playing"
-          className="group -mx-1 flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 text-left hover:bg-white/5"
+          className="group -mx-1 flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 text-left transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/5"
         >
           <Vinyl spinning={playing} size={44} />
           <div className="min-w-0">
@@ -146,7 +146,10 @@ export function PlayerBar() {
               {artistLine(track)}
             </span>
           </div>
-          <ChevronUp size={16} className="text-ink/40 group-hover:text-accent ml-1 shrink-0" />
+          <ChevronUp
+            size={16}
+            className="text-ink/40 group-hover:text-accent ml-1 shrink-0 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)]"
+          />
         </button>
 
         {/* center — transport */}
@@ -171,7 +174,7 @@ export function PlayerBar() {
             type="button"
             aria-label={volume === 0 ? "Unmute music" : "Mute music"}
             onClick={() => setVolume(volume === 0 ? 1 : 0)}
-            className="text-ink/80 grid h-9 w-9 cursor-pointer place-items-center rounded-full hover:bg-white/10"
+            className="text-ink/80 grid h-9 w-9 cursor-pointer place-items-center rounded-full transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/10"
           >
             {volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
@@ -191,7 +194,7 @@ export function PlayerBar() {
             aria-label="Toggle vinyl crackle and sound effects"
             onClick={toggleMute}
             className={cx(
-              "grid h-9 w-9 cursor-pointer place-items-center rounded-full hover:bg-white/10",
+              "grid h-9 w-9 cursor-pointer place-items-center rounded-full transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/10",
               muted ? "text-ink/35" : "text-accent",
             )}
           >
