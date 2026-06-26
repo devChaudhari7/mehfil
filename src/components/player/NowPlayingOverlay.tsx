@@ -68,7 +68,7 @@ export function NowPlayingOverlay() {
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="surface-stage overlay-fade absolute inset-0 overflow-auto outline-none"
+        className="surface-stage overlay-in absolute inset-0 overflow-auto outline-none"
       >
         <NowPlayingDeck onClose={() => setOpen(false)} />
       </div>

@@ -121,7 +121,7 @@ export function PlayerBar() {
     <div
       role="region"
       aria-label="Now playing"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[color-mix(in_srgb,#0a0a0c_88%,var(--accent))] backdrop-blur-md"
+      className="player-rise fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[color-mix(in_srgb,#0a0a0c_88%,var(--accent))] backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <Scrubber value={currentTime} max={dur} onSeek={seek} className="rounded-none" />
