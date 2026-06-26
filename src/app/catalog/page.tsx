@@ -114,7 +114,10 @@ export default function LibraryPage() {
             </thead>
             <tbody>
               {tracks.map((t) => (
-                <tr key={t.id} className="border-b border-white/5 align-top last:border-0">
+                <tr
+                  key={t.id}
+                  className="border-b border-white/5 align-top transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] last:border-0 hover:bg-white/[0.03]"
+                >
                   <td className="px-4 py-3">
                     <span className="block h-10 w-10 overflow-hidden rounded-[3px] shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
                       <RecordArt subject={{ track: t }} size="sm" variant="swatch" />

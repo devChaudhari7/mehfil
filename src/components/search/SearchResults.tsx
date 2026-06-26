@@ -65,7 +65,10 @@ export function SearchResults({
           <SectionHeading icon={Music2}>Tracks</SectionHeading>
           <ul className="mt-3 divide-y divide-white/10">
             {results.tracks.map((r) => (
-              <li key={r.id} className="flex items-center gap-3 py-2.5">
+              <li
+                key={r.id}
+                className="flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/[0.03]"
+              >
                 <PlayControl track={r.track} queue={playQueue} variant="icon" onActivate={onSelect} />
                 <div className="min-w-0 flex-1">
                   <NativeText
@@ -93,7 +96,7 @@ export function SearchResults({
                 <Link
                   href={`/album/${r.id}`}
                   onClick={onSelect}
-                  className="hover:text-accent flex items-center justify-between gap-3 py-2.5"
+                  className="hover:text-accent flex items-center justify-between gap-3 rounded-md px-2 py-2.5 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/[0.03]"
                 >
                   <span className="font-display truncate">{r.release.film}</span>
                   <span className="text-ink/50 shrink-0 font-mono text-[11px] tabular-nums">
@@ -112,7 +115,11 @@ export function SearchResults({
           <ul className="mt-3 divide-y divide-white/10">
             {results.artists.map((r) => (
               <li key={r.id}>
-                <Link href={`/artist/${r.id}`} onClick={onSelect} className="hover:text-accent block py-2.5">
+                <Link
+                  href={`/artist/${r.id}`}
+                  onClick={onSelect}
+                  className="hover:text-accent block rounded-md px-2 py-2.5 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/[0.03]"
+                >
                   {r.artist.name.native ? (
                     <NativeText
                       native={r.artist.name.native}

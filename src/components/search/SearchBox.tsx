@@ -41,7 +41,7 @@ export function SearchBox({
 
   return (
     <div className={cx("w-full", className)}>
-      <div className="focus-within:border-accent/60 flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-3 transition-colors">
+      <div className="focus-within:border-accent/60 flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-3 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)]">
         <Search size={18} className="text-ink/50 shrink-0" />
         <input
           ref={inputRef}

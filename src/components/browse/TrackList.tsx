@@ -32,7 +32,7 @@ export function TrackList({
           <li
             key={t.id}
             className={cx(
-              "flex items-center gap-4 px-2 py-3 transition-colors",
+              "flex items-center gap-4 px-2 py-3 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/[0.04]",
               isCurrent && "bg-white/[0.04]",
             )}
           >
