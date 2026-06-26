@@ -128,6 +128,22 @@ html {
   animation: overlay-fade var(--dur-3) var(--ease-out) both;
 }
 
+/* Route entrance — page content rises in on navigation (template.tsx). The
+ * persistent World (stage/player) is outside this wrapper, so it stays put. */
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.route-enter {
+  animation: route-enter var(--dur-3) var(--ease-out) both;
+}
+
 /* Persistent player bar rises from the bottom edge when a track first loads. */
 @keyframes player-rise {
   from {
