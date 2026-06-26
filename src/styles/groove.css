@@ -209,3 +209,25 @@ html {
 .player-rise {
   animation: player-rise var(--dur-3) var(--ease-out) both;
 }
+
+/* Hero "enter the groove" CTA — a slow, inviting glow breath. The base drop
+ * shadow lives in the 0%/100% stops so reduced motion (global block → ~0ms)
+ * rests on a clean static shadow. */
+@keyframes cta-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 3px 0 rgba(0, 0, 0, 0.35),
+      0 8px 20px rgba(0, 0, 0, 0.35),
+      0 0 0 0 color-mix(in srgb, var(--glow) 0%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 3px 0 rgba(0, 0, 0, 0.35),
+      0 8px 20px rgba(0, 0, 0, 0.35),
+      0 0 26px 2px color-mix(in srgb, var(--glow) 45%, transparent);
+  }
+}
+.cta-breathe {
+  animation: cta-breathe 3.4s var(--ease-out) infinite;
+}

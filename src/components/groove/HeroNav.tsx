@@ -1,29 +1,26 @@
 /*
- * HeroNav — the static hero entry links. A SERVER component passed into the client
- * GrooveStage, so these links stay out of the client hydration chunk (perf).
+ * HeroNav — the thesis line + the ONE primary action. A SERVER component passed
+ * into the client GrooveStage, so it renders server-side and the ENTER link works
+ * with zero JS (keyboard-focusable, real navigation). The cinematic enter/era
+ * journey is a client enhancement layered on top by GrooveStage; this is the
+ * accessible floor.
  */
 import Link from "next/link";
 
 export function HeroNav() {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-6">
+      <p
+        className="font-display text-ink mx-auto max-w-xl text-balance"
+        style={{ fontSize: "clamp(1.2rem, 2.8vw, 1.8rem)", lineHeight: 1.2 }}
+      >
+        Don&rsquo;t scroll the library. Travel the groove.
+      </p>
       <Link
         href="/browse"
-        className="bg-btn text-btn-ink rounded-full px-4 py-1.5 font-mono text-[11px] tracking-[0.18em] uppercase transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)] hover:brightness-110 active:translate-y-[1px]"
+        className="cta-breathe bg-btn text-btn-ink rounded-full px-7 py-3 font-mono text-xs tracking-[0.22em] uppercase transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)] hover:brightness-110 active:translate-y-[2px]"
       >
-        Travel the groove →
-      </Link>
-      <Link
-        href="/search"
-        className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
-      >
-        Search
-      </Link>
-      <Link
-        href="/catalog"
-        className="text-ink/60 hover:text-accent font-mono text-[11px] tracking-[0.18em] uppercase underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline"
-      >
-        The Library
+        Enter the groove →
       </Link>
     </div>
   );
