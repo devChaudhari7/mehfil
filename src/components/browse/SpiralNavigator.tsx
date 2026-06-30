@@ -227,11 +227,13 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
     e.preventDefault();
   }
 
-  // Wheel = travel the groove (non-passive so we can stop the page scrolling).
+  // Wheel = move focus, but ONLY as a standalone page (active). On the home scroll world
+  // (inactive) the wheel must scroll the page so the scroll-camera + era-travel run — never
+  // hijack it.
   const groupRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = groupRef.current;
-    if (!el || reduced) return;
+    if (!el || reduced || !active) return;
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaY) < 2) return;
       e.preventDefault();
@@ -239,9 +241,18 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [moveFocus, reduced]);
+  }, [moveFocus, reduced, active]);
 
-  const focused = nodes[focus];
+  // On the scroll world (inactive) the hub follows the scroll-driven era, so the year +
+  // medium visibly change as you scroll; standalone, it follows keyboard focus.
+  const dispIdx =
+    !active && nav.level === "eras"
+      ? Math.max(
+          ERAS.findIndex((e) => e.id === storeEra),
+          0,
+        )
+      : focus;
+  const focused = nodes[dispIdx];
   const staticMode = reduced || tier === "C";
 
   const announce =
@@ -288,7 +299,7 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
           role="group"
           aria-label="The groove — travel with arrow keys, Enter to open, Escape to go back"
           onKeyDown={onKeyDown}
-          className="relative aspect-square w-[min(92vw,520px)]"
+          className="relative aspect-square w-[min(94vw,82vh,680px)]"
         >
           {/* decorative groove */}
           <svg viewBox="0 0 100 100" aria-hidden="true" className="absolute inset-0 h-full w-full">
@@ -328,7 +339,7 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
               {focused && (
                 <p
                   className={cx(
-                    "text-ink mt-2 text-lg leading-tight",
+                    "text-ink mt-2 text-3xl leading-tight sm:text-4xl",
                     focused.script ? scriptFont(focused.script).display : "font-display",
                   )}
                 >
@@ -336,9 +347,11 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
                 </p>
               )}
               {focused?.sub && (
-                <p className="text-ink/55 mt-1 font-mono text-[10px] tracking-wide">{focused.sub}</p>
+                <p className="text-ink/70 mt-2 font-mono text-[11px] tracking-[0.14em]">
+                  {focused.sub}
+                </p>
               )}
-              <p className="text-ink/45 mt-2 font-mono text-[10px] tracking-[0.16em] uppercase">
+              <p className="text-accent/70 mt-3 font-mono text-[10px] tracking-[0.22em] uppercase">
                 {hint(focused)}
               </p>
             </div>
@@ -348,7 +361,7 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
           <div key={`${nav.level}:${storeEra}:${nav.releaseId ?? ""}`} className="groove-zoom absolute inset-0">
             {nodes.map((node, i) => {
               const p = points[i] ?? pointAt(0.5, GEOM);
-              const active = i === focus;
+              const active = i === dispIdx;
               const isCurrent = node.track && currentId === node.track.id;
               const disabled = node.kind === "track" && node.playable === false;
               return (

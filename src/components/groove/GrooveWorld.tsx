@@ -99,7 +99,7 @@ export function GrooveWorld() {
           <GrooveStage intro={<HeroIntro />} nav={<HeroNav />} active />
         </div>
         <div className="groove-world__spiral">
-          <div className="w-full max-w-2xl">
+          <div className="w-full max-w-4xl">
             {/* scroll owns the era at the eras level → don't let the spiral lift it too */}
             <SpiralNavigator active={false} />
           </div>
