@@ -71,6 +71,7 @@ html {
   background: #050507;
   color: var(--ink);
   font-size: 100%; /* 16px base */
+  scroll-behavior: smooth; /* in-page anchors glide; reduced-motion forces this to auto */
 }
 
 /* Comfortable-reading mode (older listeners): bump base size + leading.

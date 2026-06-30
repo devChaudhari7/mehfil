@@ -1,8 +1,10 @@
+import { GrooveWorld } from "@/components/groove/GrooveWorld";
+
 /*
- * Home — a thin shell. The visible, interactive home (MEHFIL + the big record + ENTER)
- * is the persistent GrooveWorld (depth 0) mounted in World, so traveling home↔browse is a
- * camera move within one scene, not a page swap. This shell carries the accessible heading
- * (SEO/AT) and a no-JS fallback hero with a real ENTER link.
+ * Home — the scroll world (Phase 14). The page is a tall scroll spine; GrooveWorld pins a
+ * scene and scrubs the camera off scroll: outside the record → into the grooves → through
+ * the eras. /browse folds into this (it redirects here). The sr-only heading + <noscript>
+ * keep SEO / no-JS working with a real ENTER link.
  */
 export default function Home() {
   return (
@@ -15,13 +17,14 @@ export default function Home() {
             Don&rsquo;t scroll the library. Travel the groove.
           </p>
           <a
-            href="/browse"
+            href="/catalog"
             className="bg-btn text-btn-ink rounded-full px-6 py-3 font-mono text-xs tracking-[0.2em] uppercase"
           >
-            Enter the groove →
+            Enter the library →
           </a>
         </div>
       </noscript>
+      <GrooveWorld />
     </>
   );
 }

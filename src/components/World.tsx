@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { GrainOverlay } from "@/components/GrainOverlay";
-import { GrooveWorld } from "@/components/groove/GrooveWorld";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { NowPlayingOverlay } from "@/components/player/NowPlayingOverlay";
 import { SearchPalette } from "@/components/search/SearchPalette";
@@ -18,9 +17,6 @@ export function World({ children }: { children: ReactNode }) {
   return (
     <>
       <div className="stage-bg" aria-hidden="true" />
-      {/* The one continuous world (home + the spiral), persistent behind page content
-          so traveling the groove never unmounts/remounts — it's a camera, not a route. */}
-      <GrooveWorld />
       <div className="vignette" aria-hidden="true" />
       <GrainOverlay />
       <div className="relative z-10 flex min-h-dvh flex-col">{children}</div>

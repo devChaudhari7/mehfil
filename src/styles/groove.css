@@ -233,11 +233,34 @@ html {
 }
 
 /* ------------------------------------------------------------------ *
- * The one continuous world (Phase 13). Home (depth 0, outside the record) and the
- * spiral (depth 1, inside the grooves) are two layers of ONE persistent scene; the
- * camera dollies between them via [data-depth]. Same mounted tree → no page to
- * perceive. Reduced motion: the global block zeroes the duration → an instant cut.
+ * Scroll the groove (Phase 14). The home is a tall scroll spine; the scene is PINNED
+ * and the camera scrubs off scroll progress (--groove-p / --gp-dive, written per frame
+ * by GrooveWorld). The record scales up *through* the viewer and fades while the spiral
+ * grows from the same center — you fly into the grooves. No transition: the scroll IS
+ * the timeline. Reduced motion → a stacked, normally-scrollable fallback (no scrub).
  * ------------------------------------------------------------------ */
+
+/* the spine gives the document its travel length (~4 screens of scroll) */
+.groove-spine {
+  position: relative;
+  z-index: 0;
+  height: 420vh;
+  pointer-events: none;
+}
+.groove-spine__anchor {
+  position: absolute;
+  top: 46%;
+  height: 1px;
+  width: 1px;
+}
+
+/* the pinned scene */
+.groove-world {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+}
 .groove-world__hero,
 .groove-world__spiral {
   position: absolute;
@@ -245,36 +268,34 @@ html {
   display: grid;
   place-items: center;
   transform-origin: 50% 46%;
-  transition:
-    transform var(--dur-world) var(--ease-analog),
-    opacity var(--dur-world) var(--ease-analog),
-    filter var(--dur-world) var(--ease-analog);
   will-change: transform, opacity;
 }
 
-/* depth 0 — outside the record: the hero is framed; the spiral waits far behind */
-.groove-world[data-depth="0"] .groove-world__hero {
-  transform: scale(1);
-  opacity: 1;
+/* the camera — the dive sub-progress (0 outside → 1 inside) drives both layers */
+.groove-world__hero {
+  transform: scale(calc(1 + 2.4 * var(--gp-dive, 0)));
+  opacity: calc(1 - var(--gp-dive, 0));
 }
-.groove-world[data-depth="0"] .groove-world__spiral {
-  transform: scale(0.72);
-  opacity: 0;
-  filter: blur(6px);
+.groove-world__spiral {
+  transform: scale(calc(0.72 + 0.28 * var(--gp-dive, 0)));
+  opacity: var(--gp-dive, 0);
+  /* hidden (focus + pointer) until you are inside the grooves */
+  visibility: hidden;
+  pointer-events: none;
+}
+html[data-groove-phase="in"] .groove-world__spiral {
+  visibility: visible;
+  pointer-events: auto;
+}
+html[data-groove-phase="in"] .groove-world__hero {
+  visibility: hidden;
   pointer-events: none;
 }
 
-/* depth 1 — inside the grooves: the camera flew *through* the record into the spiral */
-.groove-world[data-depth="1"] .groove-world__hero {
-  transform: scale(3.4);
-  opacity: 0;
-  filter: blur(8px);
-  pointer-events: none;
-}
-.groove-world[data-depth="1"] .groove-world__spiral {
-  transform: scale(1);
-  opacity: 1;
-  filter: blur(0);
+/* reduced-motion fallback: normal flow, no pinned scrub */
+.groove-world--static {
+  position: relative;
+  z-index: 20;
 }
 
 /* ------------------------------------------------------------------ *

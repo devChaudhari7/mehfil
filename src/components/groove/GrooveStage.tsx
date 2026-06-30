@@ -22,7 +22,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { GrooveLink } from "@/components/GrooveLink";
-import { getEra, type EraId } from "@/lib/eras";
+import { getEra } from "@/lib/eras";
 import { useEraStore } from "@/lib/useEraStore";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useRenderTier } from "@/lib/useRenderTier";
@@ -45,11 +45,6 @@ const AMP = { slow: 0.5, mid: 1.0, fast: 1.8 } as const;
 // reflows after first paint — the CLS fix). Monumental: the record is the hero.
 const MEDIUM_SIZE = "min(86vw, 64vh, 520px)";
 
-// The cinematic time-travel: dawn of recorded sound → survey the eras → home to
-// the golden age (60s). Matches the reduced-motion/SSR default so they converge.
-const JOURNEY: EraId[] = ["50s", "60s", "70s", "80s", "90s", "60s"];
-const HOME_ERA: EraId = "60s";
-
 export function GrooveStage({
   intro,
   nav,
@@ -70,7 +65,6 @@ export function GrooveStage({
   const rootRef = useRef<HTMLElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(0);
-  const introDone = useRef(false);
 
   useEffect(() => {
     const el = boxRef.current;
@@ -82,43 +76,6 @@ export function GrooveStage({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-
-  // The auto-travel opening (Tier B + motion only). Runs once; any intent skips
-  // to the home era so the morph never fights the user.
-  useEffect(() => {
-    if (!active || reduced || tier !== "B" || introDone.current) return;
-    introDone.current = true;
-    const setEra = useEraStore.getState().setEra;
-    let i = 0;
-    setEra(JOURNEY[0]!); // ignite at the dawn of recorded sound (shellac 50s)
-    const timer = window.setInterval(() => {
-      i += 1;
-      if (i >= JOURNEY.length) {
-        window.clearInterval(timer);
-        return;
-      }
-      setEra(JOURNEY[i]!);
-    }, 1300);
-
-    const skip = () => {
-      window.clearInterval(timer);
-      setEra(HOME_ERA);
-      teardown();
-    };
-    const teardown = () => {
-      window.removeEventListener("pointerdown", skip);
-      window.removeEventListener("keydown", skip);
-      window.removeEventListener("wheel", skip);
-    };
-    window.addEventListener("pointerdown", skip, { passive: true });
-    window.addEventListener("keydown", skip);
-    window.addEventListener("wheel", skip, { passive: true });
-
-    return () => {
-      window.clearInterval(timer);
-      teardown();
-    };
-  }, [active, reduced, tier]);
 
   // One GSAP load sequence rises the text in (lazy; skipped under reduced motion).
   useEffect(() => {
@@ -201,16 +158,13 @@ export function GrooveStage({
 
           <SynestheticBloom />
 
-          {/* the record (in front, eclipsing the title) — also a click target in */}
+          {/* the record (in front, eclipsing the title) — a scroll cue into the grooves */}
           {tier !== "A" && size > 0 && (
-            <GrooveLink
-              href="/browse"
-              intent="journey"
-              windup
+            <a
+              href="#groove"
               aria-hidden="true"
               tabIndex={-1}
               className="groove-zoom relative z-10 block cursor-pointer"
-              style={{ viewTransitionName: "groove-record" }}
             >
               <MediumArtifact
                 era={era}
@@ -220,7 +174,7 @@ export function GrooveStage({
                 clock={clock}
                 size={size}
               />
-            </GrooveLink>
+            </a>
           )}
         </div>
 
