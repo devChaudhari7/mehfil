@@ -299,7 +299,7 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
           role="group"
           aria-label="The groove — travel with arrow keys, Enter to open, Escape to go back"
           onKeyDown={onKeyDown}
-          className="relative aspect-square w-[min(94vw,82vh,680px)]"
+          className="relative aspect-square w-[min(92vw,70vh,620px)]"
         >
           {/* decorative groove */}
           <svg viewBox="0 0 100 100" aria-hidden="true" className="absolute inset-0 h-full w-full">

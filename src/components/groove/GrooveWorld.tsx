@@ -21,6 +21,7 @@ import { useEffect } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { ERA_ORDER, useEraStore } from "@/lib/useEraStore";
 import { SpiralNavigator } from "@/components/browse";
+import { DropNeedle } from "./DropNeedle";
 import { GrooveStage } from "./GrooveStage";
 import { HeroIntro } from "./HeroIntro";
 import { HeroNav } from "./HeroNav";
@@ -102,6 +103,10 @@ export function GrooveWorld() {
           <div className="w-full max-w-4xl">
             {/* scroll owns the era at the eras level → don't let the spiral lift it too */}
             <SpiralNavigator active={false} />
+          </div>
+          {/* the payoff — drop the needle on the era you've traveled to */}
+          <div className="pointer-events-auto absolute bottom-[6vh] left-1/2 -translate-x-1/2">
+            <DropNeedle />
           </div>
         </div>
       </div>
