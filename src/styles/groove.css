@@ -128,16 +128,15 @@ html {
   animation: overlay-fade var(--dur-3) var(--ease-out) both;
 }
 
-/* Route entrance — page content rises in on navigation (template.tsx). The
- * persistent World (stage/player) is outside this wrapper, so it stays put. */
+/* Route entrance — page content fades in on navigation (template.tsx). OPACITY ONLY:
+ * a retained transform here would create a containing block and break `position: fixed`
+ * for the home scroll scene (.groove-world) nested inside this wrapper. */
 @keyframes route-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 .route-enter {
@@ -244,7 +243,7 @@ html {
 .groove-spine {
   position: relative;
   z-index: 0;
-  height: 420vh;
+  height: 320vh;
   pointer-events: none;
 }
 .groove-spine__anchor {
@@ -271,14 +270,16 @@ html {
   will-change: transform, opacity;
 }
 
-/* the camera — the dive sub-progress (0 outside → 1 inside) drives both layers */
+/* the camera — the dive sub-progress (0 outside → 1 inside) crossfades the layers.
+ * The record fades out by ~⅔ of the dive (gone before it grows too large to frame),
+ * while the spiral fades up from ~¼ — a true dolly *through* the record. */
 .groove-world__hero {
-  transform: scale(calc(1 + 2.4 * var(--gp-dive, 0)));
-  opacity: calc(1 - var(--gp-dive, 0));
+  transform: scale(calc(1 + 1.7 * var(--gp-dive, 0)));
+  opacity: calc(1.25 - 1.9 * var(--gp-dive, 0));
 }
 .groove-world__spiral {
-  transform: scale(calc(0.72 + 0.28 * var(--gp-dive, 0)));
-  opacity: var(--gp-dive, 0);
+  transform: scale(calc(0.78 + 0.22 * var(--gp-dive, 0)));
+  opacity: calc(1.7 * var(--gp-dive, 0) - 0.45);
   /* hidden (focus + pointer) until you are inside the grooves */
   visibility: hidden;
   pointer-events: none;

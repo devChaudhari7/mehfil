@@ -10,8 +10,8 @@
 export function HeroIntro() {
   return (
     <h1
-      className="groove-display font-display text-ink/25 leading-none whitespace-nowrap select-none"
-      style={{ fontSize: "clamp(3.25rem, 17vw, 11rem)" }}
+      className="groove-display font-display text-ink/45 leading-none whitespace-nowrap select-none"
+      style={{ fontSize: "clamp(3rem, 12vw, 8.5rem)" }}
     >
       MEHFIL
     </h1>

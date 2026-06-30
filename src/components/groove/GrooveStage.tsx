@@ -147,11 +147,11 @@ export function GrooveStage({
           className="relative mt-6 grid place-items-center sm:mt-8"
           style={{ width: MEDIUM_SIZE, height: MEDIUM_SIZE }}
         >
-          {/* giant MEHFIL — wider than the disc, centered behind it (eclipsed) */}
+          {/* giant MEHFIL — frames the disc, peeking out on either side (eclipsed) */}
           <div
             data-intro
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-1/2 z-0 w-[160vw] max-w-[1200px] -translate-x-1/2 -translate-y-1/2"
+            className="pointer-events-none absolute top-1/2 left-1/2 z-0 w-[118vw] max-w-[860px] -translate-x-1/2 -translate-y-1/2"
           >
             {intro}
           </div>
