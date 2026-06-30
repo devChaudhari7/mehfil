@@ -50,7 +50,17 @@ const MEDIUM_SIZE = "min(86vw, 64vh, 520px)";
 const JOURNEY: EraId[] = ["50s", "60s", "70s", "80s", "90s", "60s"];
 const HOME_ERA: EraId = "60s";
 
-export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode }) {
+export function GrooveStage({
+  intro,
+  nav,
+  active = true,
+}: {
+  intro?: ReactNode;
+  nav?: ReactNode;
+  /** True only when the hero is the live depth (0). Gates the auto-journey + backdrop
+   *  so a deep-linked /browse (depth 1) never runs the home showreel behind the spiral. */
+  active?: boolean;
+}) {
   const tier = useRenderTier();
   const era = useEraStore((s) => s.era);
   const status = usePlayerStore((s) => s.status);
@@ -76,7 +86,7 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
   // The auto-travel opening (Tier B + motion only). Runs once; any intent skips
   // to the home era so the morph never fights the user.
   useEffect(() => {
-    if (reduced || tier !== "B" || introDone.current) return;
+    if (!active || reduced || tier !== "B" || introDone.current) return;
     introDone.current = true;
     const setEra = useEraStore.getState().setEra;
     let i = 0;
@@ -108,7 +118,7 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
       window.clearInterval(timer);
       teardown();
     };
-  }, [reduced, tier]);
+  }, [active, reduced, tier]);
 
   // One GSAP load sequence rises the text in (lazy; skipped under reduced motion).
   useEffect(() => {
@@ -144,10 +154,11 @@ export function GrooveStage({ intro, nav }: { intro?: ReactNode; nav?: ReactNode
     <section
       ref={rootRef}
       aria-label="The Groove"
-      className="groove-stage relative grid min-h-[100svh] w-full place-items-center overflow-hidden px-5 pt-20 pb-28 sm:pb-32"
+      className="groove-stage absolute inset-0 grid place-items-center overflow-hidden px-5 pb-24"
     >
-      {/* Decorative backdrop (dynamic; absolute → CLS-safe to defer) */}
-      <GrooveScene tier={tier} clock={clock} amplitude={amplitude} />
+      {/* Decorative backdrop (dynamic; absolute → CLS-safe to defer). Only while the
+          hero is the live depth, so its canvas rAF stops once the camera is inside. */}
+      {active && <GrooveScene tier={tier} clock={clock} amplitude={amplitude} />}
 
       {/* Quiet secondary — utility relocated off the focal path */}
       <nav className="absolute top-5 right-5 z-20 flex items-center gap-4 font-mono text-[11px] tracking-[0.18em] uppercase">

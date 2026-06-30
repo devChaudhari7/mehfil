@@ -101,19 +101,11 @@ export function enterGroove(href = "/browse"): void {
     if (typeof window !== "undefined") window.location.assign(href);
     return;
   }
-  if (c.reduced || !viewTransition()) {
-    c.push(href);
-    return;
-  }
-  playEnterGroove();
-  const root = document.documentElement;
-  root.dataset.entering = "1";
-  window.setTimeout(() => {
-    travel(href, "journey");
-    window.setTimeout(() => {
-      delete root.dataset.entering;
-    }, 700);
-  }, 340);
+  // The persistent GrooveWorld animates the camera (depth 0→1) on the pathname change,
+  // so ENTER is just the signature sound + a plain push — NOT a View Transition. The
+  // record dollies into the grooves; there is no page to perceive.
+  if (!c.reduced) playEnterGroove();
+  c.push(href);
 }
 
 /** Mounted once in World: keeps the controller fresh + resolves the VT on commit. */

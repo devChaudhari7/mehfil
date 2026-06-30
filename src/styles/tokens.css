@@ -57,6 +57,7 @@
   --dur-3: 360ms; /* entrance: overlays, page transition, panel */
   --dur-4: 520ms; /* large: spiral zoom level */
   --dur-xfade: 180ms; /* utility route crossfade — near-invisible */
+  --dur-world: 900ms; /* camera dolly between world depths (outside record ↔ inside grooves) */
   --morph-dur: 1.1s; /* era-morph transition length (brief/art-direction) */
   --stagger-step: 45ms; /* per-item list-entrance delay */
   --spin-vinyl: 1.8s; /* believable 33⅓ rev (per-medium, intentional) */

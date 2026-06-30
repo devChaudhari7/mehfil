@@ -232,18 +232,49 @@ html {
   animation: cta-breathe 3.4s var(--ease-out) infinite;
 }
 
-/* Home ENTER wind-up (Phase 12): a brief "camera push-in" before the journey
- * morph, driven by html[data-entering] (set by enterGroove). Reduced motion zeroes
- * the transition globally + the controller skips the wind-up entirely. */
-.groove-stage {
-  transform-origin: 50% 44%;
+/* ------------------------------------------------------------------ *
+ * The one continuous world (Phase 13). Home (depth 0, outside the record) and the
+ * spiral (depth 1, inside the grooves) are two layers of ONE persistent scene; the
+ * camera dollies between them via [data-depth]. Same mounted tree → no page to
+ * perceive. Reduced motion: the global block zeroes the duration → an instant cut.
+ * ------------------------------------------------------------------ */
+.groove-world__hero,
+.groove-world__spiral {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 46%;
   transition:
-    transform var(--dur-3) var(--ease-analog),
-    filter var(--dur-3) var(--ease-out);
+    transform var(--dur-world) var(--ease-analog),
+    opacity var(--dur-world) var(--ease-analog),
+    filter var(--dur-world) var(--ease-analog);
+  will-change: transform, opacity;
 }
-html[data-entering] .groove-stage {
-  transform: scale(1.06);
-  filter: brightness(1.06);
+
+/* depth 0 — outside the record: the hero is framed; the spiral waits far behind */
+.groove-world[data-depth="0"] .groove-world__hero {
+  transform: scale(1);
+  opacity: 1;
+}
+.groove-world[data-depth="0"] .groove-world__spiral {
+  transform: scale(0.72);
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* depth 1 — inside the grooves: the camera flew *through* the record into the spiral */
+.groove-world[data-depth="1"] .groove-world__hero {
+  transform: scale(3.4);
+  opacity: 0;
+  filter: blur(8px);
+  pointer-events: none;
+}
+.groove-world[data-depth="1"] .groove-world__spiral {
+  transform: scale(1);
+  opacity: 1;
+  filter: blur(0);
 }
 
 /* ------------------------------------------------------------------ *

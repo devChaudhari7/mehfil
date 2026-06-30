@@ -132,7 +132,7 @@ function listHref(level: Level, era: EraId, releaseId?: string): string {
   return `/era/${getEra(era).decade}`;
 }
 
-export function SpiralNavigator() {
+export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
   const tier = useRenderTier();
   const reduced = useReducedMotion();
   const storeEra = useEraStore((s) => s.era);
@@ -152,12 +152,14 @@ export function SpiralNavigator() {
   const clampFocus = useCallback((i: number) => Math.min(Math.max(i, 0), nodes.length - 1), [nodes.length]);
 
   // Travelling the era level lifts the selection into useEraStore (single source),
-  // so the palette morphs AND "Browse as list" tracks the choice live.
+  // so the palette morphs AND "Browse as list" tracks the choice live. Only when this
+  // is the live depth (active) — at depth 0 the home auto-journey owns the era, and the
+  // hidden spiral must not fight it (Phase 13).
   useEffect(() => {
-    if (nav.level !== "eras") return;
+    if (!active || nav.level !== "eras") return;
     const node = nodes[focus];
     if (node?.eraId && node.eraId !== storeEra) useEraStore.getState().setEra(node.eraId);
-  }, [nav.level, focus, nodes, storeEra]);
+  }, [active, nav.level, focus, nodes, storeEra]);
 
   const moveFocus = useCallback(
     (delta: number) => {
