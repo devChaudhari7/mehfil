@@ -44,7 +44,7 @@ const AMP = { slow: 0.5, mid: 1.0, fast: 1.8 } as const;
 
 // CSS-fixed reserved size for the central record (identical SSR↔client so it never
 // reflows after first paint — the CLS fix). Monumental: the record is the hero.
-const MEDIUM_SIZE = "min(86vw, 64vh, 520px)";
+const MEDIUM_SIZE = "min(72vw, 46vh, 400px)";
 
 export function GrooveStage({
   intro,
@@ -134,32 +134,23 @@ export function GrooveStage({
         </GrooveLink>
       </nav>
 
-      {/* The stage: kicker · the title-eclipsing record · era caption · thesis + ENTER */}
+      {/* The stage: brand · the morphing record · era caption · thesis + CTA · era picker */}
       <div className="relative z-10 flex flex-col items-center text-center">
-        <p
-          data-intro
-          className="text-accent font-mono text-[11px] tracking-[0.34em] uppercase"
-        >
-          The medium is the map
-        </p>
+        {/* brand */}
+        <div data-intro className="flex flex-col items-center">
+          {intro}
+          <p className="text-accent/80 mt-2.5 font-mono text-[10px] tracking-[0.36em] uppercase">
+            The medium is the map
+          </p>
+        </div>
 
+        {/* the morphing record — a scroll cue into the grooves */}
         <div
           ref={boxRef}
-          className="relative mt-6 grid place-items-center sm:mt-8"
+          className="relative mt-4 grid place-items-center sm:mt-5"
           style={{ width: MEDIUM_SIZE, height: MEDIUM_SIZE }}
         >
-          {/* giant MEHFIL — frames the disc, peeking out on either side (eclipsed) */}
-          <div
-            data-intro
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-1/2 z-0 w-[118vw] max-w-[860px] -translate-x-1/2 -translate-y-1/2"
-          >
-            {intro}
-          </div>
-
           <SynestheticBloom />
-
-          {/* the record (in front, eclipsing the title) — a scroll cue into the grooves */}
           {tier !== "A" && size > 0 && (
             <a
               href="#groove"
@@ -182,19 +173,19 @@ export function GrooveStage({
         {/* era caption — updates as the world morphs through time */}
         <p
           data-intro
-          className="text-ink/60 mt-6 font-mono text-[11px] tracking-[0.22em] uppercase tabular-nums"
+          className="text-ink/55 mt-4 font-mono text-[11px] tracking-[0.22em] uppercase tabular-nums"
         >
           {cfg.decade} · {cfg.mediumLabel}
         </p>
 
-        <div data-intro className="mt-8">
+        <div data-intro className="mt-5">
           {nav}
         </div>
-      </div>
 
-      {/* choose where your journey begins — persisted, smooth morph */}
-      <div data-intro className="absolute bottom-[4.5vh] left-1/2 z-10 -translate-x-1/2">
-        <EraPicker />
+        {/* choose where your journey begins — persisted, smooth morph */}
+        <div data-intro className="mt-7">
+          <EraPicker />
+        </div>
       </div>
     </section>
   );

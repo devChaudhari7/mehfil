@@ -121,12 +121,17 @@ export function PlayerBar() {
     <div
       role="region"
       aria-label="Now playing"
-      className="player-rise fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[color-mix(in_srgb,#0a0a0c_88%,var(--accent))] backdrop-blur-md"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="player-rise fixed bottom-3 left-1/2 z-50 w-[min(96vw,1080px)] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/[0.08] bg-[color-mix(in_srgb,#070709_86%,var(--accent))]/85 shadow-[0_24px_70px_rgba(0,0,0,0.6)] backdrop-blur-2xl sm:bottom-4"
+      style={{ marginBottom: "env(safe-area-inset-bottom)" }}
     >
+      {/* premium top edge — a faint accent filament */}
+      <div
+        aria-hidden="true"
+        className="via-accent/35 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"
+      />
       <Scrubber value={currentTime} max={dur} onSeek={seek} className="rounded-none" />
 
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-3 py-2 sm:px-5">
+      <div className="flex items-center gap-3 px-3.5 py-2.5 sm:px-4">
         {/* left — mini turntable + title; tap to expand into the cassette deck */}
         <button
           type="button"
@@ -134,7 +139,9 @@ export function PlayerBar() {
           aria-label="Open now playing"
           className="group -mx-1 flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 text-left transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/5"
         >
-          <Vinyl spinning={playing} size={44} />
+          <span className="shrink-0 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
+            <Vinyl spinning={playing} size={46} />
+          </span>
           <div className="min-w-0">
             <span
               lang={LANG[track.script]}

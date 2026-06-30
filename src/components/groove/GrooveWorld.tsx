@@ -51,13 +51,13 @@ export function GrooveWorld() {
       root.style.setProperty("--gp-about", about.toFixed(4));
       root.dataset.groovePhase = p < DIVE_END ? "out" : "in";
       root.dataset.grooveEnd = about > 0.5 ? "1" : "";
-      // Travel forward from the chosen home era to the present (90s), over DIVE_END→ERA_TRAVEL_END.
+      // Travel through ALL eras, starting from the chosen home era and wrapping (so picking
+      // 1980 still reaches every era — the groove loops). Over DIVE_END→ERA_TRAVEL_END.
+      const n = ERA_ORDER.length;
       const homeIdx = Math.max(ERA_ORDER.indexOf(useEraStore.getState().homeEra), 0);
       const et = clamp01((p - DIVE_END) / (ERA_TRAVEL_END - DIVE_END));
-      const idx = Math.min(
-        homeIdx + Math.floor(et * (ERA_ORDER.length - homeIdx)),
-        ERA_ORDER.length - 1,
-      );
+      const steps = Math.min(Math.floor(et * n), n - 1);
+      const idx = (homeIdx + steps) % n;
       if (idx !== lastEra) {
         lastEra = idx;
         const era = ERA_ORDER[idx];
