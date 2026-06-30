@@ -36,7 +36,7 @@ export function GrooveWorld() {
 
   return (
     <div
-      className="groove-world fixed inset-0 z-[1] overflow-hidden"
+      className="groove-world fixed inset-0 z-20 overflow-hidden"
       data-depth={depth}
       aria-label="The Groove"
     >
