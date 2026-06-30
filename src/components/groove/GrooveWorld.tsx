@@ -116,8 +116,9 @@ export function GrooveWorld() {
             {/* scroll owns the era at the eras level → don't let the spiral lift it too */}
             <SpiralNavigator active={false} />
           </div>
-          {/* the payoff — drop the needle on the era you've traveled to */}
-          <div className="pointer-events-auto absolute bottom-[6vh] left-1/2 -translate-x-1/2">
+          {/* the payoff — drop the needle on the era you've traveled to (clears the
+              floating player bar) */}
+          <div className="pointer-events-auto absolute bottom-[15vh] left-1/2 -translate-x-1/2">
             <DropNeedle />
           </div>
         </div>

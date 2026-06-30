@@ -1,19 +1,22 @@
 "use client";
 
 /*
- * NowPlayingDeck — the full-screen cassette deck (Phase 6). Shared by the in-place
- * overlay and the /now-playing route. The cassette reels turn and the tape
- * redistributes with progress (driven by the interpolated clock, never raw
- * currentTime); a bilingual J-card carries the title; the Scrubber is the
- * scrub-as-tape timeline. Reduced motion → static reels + a static tape fill, full
- * keyboard control, and an aria-live announcement on track changes.
+ * NowPlayingDeck — the full-screen "now playing" stage (Phase 14 premium redesign).
+ *
+ * The medium is the map even here: the track's OWN era artifact spins at the heart of the
+ * frame (shellac / vinyl / cassette / CD), the needle rides the groove, and the synesthetic
+ * raga-light blooms behind it. A quiet, confident info column carries the title (native +
+ * Latin), the artist, and the scrub-as-tape timeline. Reduced motion → everything static,
+ * full keyboard control, an aria-live announcement on track changes.
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Pause, Play, SkipBack, SkipForward, X } from "lucide-react";
-import { Cassette } from "@/components/groove/Cassette";
+import { MediumArtifact } from "@/components/groove/MediumArtifact";
+import { SynestheticBloom } from "@/components/groove/SynestheticBloom";
 import { NativeText } from "@/components/ui";
-import { RecordArt } from "@/components/art";
+import { decadeToEraId } from "@/lib/catalog";
+import { DEFAULT_ERA, getEra } from "@/lib/eras";
 import { artistLine, usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useInterpolatedTime } from "@/lib/useInterpolatedTime";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -46,8 +49,8 @@ function DeckButton({
       className={cx(
         "grid shrink-0 cursor-pointer place-items-center rounded-full transition-[transform,filter,background-color,box-shadow] duration-[var(--dur-1)] ease-[var(--ease-analog)] active:translate-y-[1px]",
         primary
-          ? "bg-btn text-btn-ink h-14 w-14 shadow-[0_3px_0_rgba(0,0,0,0.35),0_6px_14px_rgba(0,0,0,0.35)] hover:brightness-110 active:shadow-[0_1px_0_rgba(0,0,0,0.35)]"
-          : "text-ink h-11 w-11 hover:bg-white/10",
+          ? "bg-btn text-btn-ink h-16 w-16 shadow-[0_4px_0_rgba(0,0,0,0.35),0_10px_24px_rgba(0,0,0,0.4)] hover:brightness-110 active:shadow-[0_1px_0_rgba(0,0,0,0.35)]"
+          : "text-ink/80 hover:text-ink h-12 w-12 hover:bg-white/10",
       )}
     >
       {children}
@@ -77,10 +80,23 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
   const unlocked = useSoundStore((s) => s.unlocked);
 
   const counterRef = useRef<HTMLSpanElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
 
   const dur = duration || track?.durationSec || 0;
   const playing = status === "playing";
-  const progress = dur > 0 ? Math.min(currentTime / dur, 1) : 0;
+
+  // Measure the artifact box (feeds the medium sub-components their px size).
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width ?? 0;
+      if (w) setSize(Math.round(w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [track]);
 
   // Smooth tape counter between the 250ms polls (no per-frame React renders).
   useEffect(() => {
@@ -120,11 +136,18 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
     </Link>
   ) : null;
 
+  const era = track ? decadeToEraId(track.era) : DEFAULT_ERA;
+  const medium = getEra(era).medium;
+  const showNeedle = medium === "shellac" || medium === "vinyl";
+
   return (
-    <div className="flex min-h-dvh w-full flex-col px-5 py-5 sm:px-8 sm:py-7">
-      <div className="flex items-center justify-between">
+    <div className="relative flex min-h-dvh w-full flex-col px-5 py-5 sm:px-8 sm:py-7">
+      {/* the raga-light, breathing behind the whole stage */}
+      <SynestheticBloom />
+
+      <div className="relative z-10 flex items-center justify-between">
         <p className="text-accent font-mono text-[11px] tracking-[0.28em] uppercase">
-          Now Playing · Tape
+          Now Playing
         </p>
         {closeControl}
       </div>
@@ -135,7 +158,7 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
       </p>
 
       {!track ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-4 text-center">
           <p className="text-ink/70 font-display text-2xl">Nothing playing</p>
           <Link
             href="/browse"
@@ -145,66 +168,63 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
           </Link>
         </div>
       ) : (
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8 sm:flex-row sm:items-center sm:gap-12">
-          {/* the cassette */}
-          <div className="aspect-[100/64] w-[min(88vw,460px)] shrink-0">
-            <Cassette
-              className="h-full w-full"
-              variant="deck"
-              progress={progress}
-              clock={reduced ? undefined : clock}
-            />
+        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-10 sm:flex-row sm:gap-16">
+          {/* the era artifact — spins at the heart of the frame */}
+          <div
+            ref={boxRef}
+            className="relative grid aspect-square w-[min(82vw,50vh,440px)] shrink-0 place-items-center"
+          >
+            {size > 0 && (
+              <MediumArtifact
+                era={era}
+                spinning={playing && !reduced}
+                showNeedle={showNeedle}
+                animated={!reduced}
+                clock={clock}
+                size={size}
+              />
+            )}
           </div>
 
-          {/* J-card */}
-          <div className="w-full max-w-sm">
-            <div className="surface-paper rounded-[10px] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
-              <div className="flex items-start gap-4">
-                <span
-                  aria-hidden="true"
-                  className="block h-16 w-16 shrink-0 overflow-hidden rounded-[4px] shadow-[0_3px_8px_rgba(0,0,0,0.4)]"
-                >
-                  <RecordArt subject={{ track }} size="sm" variant="swatch" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <span className="text-ink/60 font-mono text-[10px] tracking-[0.22em] uppercase">
-                    {track.era} {track.film ? `· ${track.film}` : ""}
-                  </span>
-                  <div className="mt-2">
-                    <NativeText
-                      native={track.title.native}
-                      latin={track.title.latin}
-                      script={track.script}
-                      size="h2"
-                    />
-                  </div>
-                </div>
-              </div>
-              <p className="text-ink/70 mt-3 font-mono text-[11px] tracking-[0.14em] uppercase">
-                {artistLine(track)}
-              </p>
+          {/* the info column */}
+          <div className="flex w-full max-w-md flex-col">
+            <p className="text-ink/50 font-mono text-[11px] tracking-[0.22em] uppercase">
+              {getEra(era).decade} · {getEra(era).mediumLabel}
+              {track.film ? ` · ${track.film}` : ""}
+            </p>
+
+            <div className="mt-4">
+              <NativeText
+                native={track.title.native}
+                latin={track.title.latin}
+                script={track.script}
+                size="h1"
+              />
             </div>
 
-            {/* tape counter + scrub-as-tape */}
-            <div className="mt-6">
-              <div className="text-ink/70 flex items-center justify-between font-mono text-[11px] tracking-[0.14em] tabular-nums">
+            <p className="text-ink/65 mt-3 font-mono text-xs tracking-[0.14em] uppercase">
+              {artistLine(track)}
+            </p>
+
+            {/* scrub-as-tape timeline */}
+            <div className="mt-8">
+              <Scrubber value={currentTime} max={dur} onSeek={seek} />
+              <div className="text-ink/55 mt-2 flex items-center justify-between font-mono text-[11px] tabular-nums">
                 <span ref={counterRef}>{fmt(currentTime)}</span>
-                <span className="text-ink/40">TAPE</span>
                 <span>{fmt(dur)}</span>
               </div>
-              <Scrubber value={currentTime} max={dur} onSeek={seek} className="mt-2" />
             </div>
 
             {/* transport */}
-            <div className="mt-6 flex items-center justify-center gap-4">
+            <div className="mt-8 flex items-center gap-5">
               <DeckButton label="Previous track" onClick={prev}>
-                <SkipBack size={20} />
+                <SkipBack size={22} />
               </DeckButton>
               <DeckButton label={playing ? "Pause" : "Play"} primary onClick={handlePlayPause}>
-                {playing ? <Pause size={24} /> : <Play size={24} />}
+                {playing ? <Pause size={26} /> : <Play size={26} />}
               </DeckButton>
               <DeckButton label="Next track" onClick={next}>
-                <SkipForward size={20} />
+                <SkipForward size={22} />
               </DeckButton>
             </div>
           </div>

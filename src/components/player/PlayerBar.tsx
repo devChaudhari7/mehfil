@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { ChevronUp, Disc3, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { cx } from "@/lib/cx";
 import { scriptFont, type Script } from "@/lib/fonts";
-import { Vinyl } from "@/components/ui";
+import { RecordArt } from "@/components/art";
 import { artistLine, usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useNowPlaying } from "@/lib/useNowPlaying";
 import { useEraStore } from "@/lib/useEraStore";
@@ -139,17 +139,20 @@ export function PlayerBar() {
           aria-label="Open now playing"
           className="group -mx-1 flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg px-1 py-1 text-left transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:bg-white/5"
         >
-          <span className="shrink-0 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
-            <Vinyl spinning={playing} size={46} />
+          <span className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
+            <RecordArt subject={{ track }} variant="swatch" />
           </span>
           <div className="min-w-0">
+            <span className="text-accent/70 hidden font-mono text-[9px] tracking-[0.22em] uppercase sm:block">
+              {playing ? "Now playing" : "Paused"}
+            </span>
             <span
               lang={LANG[track.script]}
-              className={cx("text-ink block truncate text-sm leading-tight", font.display)}
+              className={cx("text-ink mt-0.5 block truncate text-[15px] leading-tight", font.display)}
             >
               {track.title.native}
             </span>
-            <span className="text-ink/60 block truncate font-mono text-[11px] tracking-wide">
+            <span className="text-ink/55 block truncate font-mono text-[11px] tracking-wide">
               {artistLine(track)}
             </span>
           </div>
