@@ -299,6 +299,26 @@ html[data-groove-phase="in"] .groove-world__hero {
   z-index: 20;
 }
 
+/* the closing colophon — fades in over the last stretch of scroll (--gp-about), covering
+ * the spiral as the journey resolves. Interactive only once it's mostly up (data-groove-end). */
+.groove-world__about {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: var(--gp-about, 0);
+  background: radial-gradient(120% 120% at 50% 42%, var(--s1) 0%, var(--s2) 68%, #050507 100%);
+  visibility: hidden;
+  pointer-events: none;
+}
+html[data-groove-end="1"] .groove-world__about {
+  visibility: visible;
+  pointer-events: auto;
+}
+html[data-groove-end="1"] .groove-world__spiral {
+  pointer-events: none;
+}
+
 /* ------------------------------------------------------------------ *
  * View Transitions (Phase 12) — one mechanism, three art-directed
  * intents selected by `data-vt` on <html> (set by useGrooveTransition).

@@ -22,6 +22,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { GrooveLink } from "@/components/GrooveLink";
+import { EraPicker } from "./EraPicker";
 import { getEra } from "@/lib/eras";
 import { useEraStore } from "@/lib/useEraStore";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
@@ -189,6 +190,11 @@ export function GrooveStage({
         <div data-intro className="mt-8">
           {nav}
         </div>
+      </div>
+
+      {/* choose where your journey begins — persisted, smooth morph */}
+      <div data-intro className="absolute bottom-[4.5vh] left-1/2 z-10 -translate-x-1/2">
+        <EraPicker />
       </div>
     </section>
   );
