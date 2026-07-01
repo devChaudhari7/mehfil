@@ -72,6 +72,9 @@ html {
   color: var(--ink);
   font-size: 100%; /* 16px base */
   scroll-behavior: smooth; /* in-page anchors glide; reduced-motion forces this to auto */
+  /* Reserve the scrollbar gutter so the page never shifts when a scrollbar appears or
+     disappears (e.g. play vs pause) — kills the "laggy" reflow. */
+  scrollbar-gutter: stable;
 }
 
 /* Comfortable-reading mode (older listeners): bump base size + leading.

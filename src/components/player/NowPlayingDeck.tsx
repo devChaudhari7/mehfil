@@ -146,8 +146,14 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
       <SynestheticBloom />
 
       <div className="relative z-10 flex items-center justify-between">
-        <p className="text-accent font-mono text-[11px] tracking-[0.28em] uppercase">
-          Now Playing
+        <p className="text-accent flex items-center gap-2.5 font-mono text-[11px] tracking-[0.34em] uppercase">
+          <span aria-hidden="true" className="relative flex h-2 w-2">
+            {playing && (
+              <span className="bg-accent absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" />
+            )}
+            <span className="bg-accent relative inline-flex h-2 w-2 rounded-full" />
+          </span>
+          {playing ? "Now Playing" : "Paused"}
         </p>
         {closeControl}
       </div>
