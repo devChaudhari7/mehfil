@@ -1,3 +1,4 @@
+import { BootSequence } from "@/components/groove/BootSequence";
 import { GrooveWorld } from "@/components/groove/GrooveWorld";
 
 /*
@@ -25,6 +26,8 @@ export default function Home() {
         </div>
       </noscript>
       <GrooveWorld />
+      {/* the analog power-on — first arrival each session; skippable; silent */}
+      <BootSequence />
     </>
   );
 }

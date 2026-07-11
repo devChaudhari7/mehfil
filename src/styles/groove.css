@@ -420,6 +420,97 @@ html[data-era-flash="90s"] .era-flash {
   animation: era-flash-fade 0.32s var(--ease-out) both;
 }
 
+/* ------------------------------------------------------------------ *
+ * Phase 15.8 · the analog power-on (first arrival each session)
+ * ------------------------------------------------------------------ */
+.boot-seq {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  background: #050507;
+  transition: opacity 0.6s var(--ease-out);
+}
+.boot-seq[data-leave="1"] {
+  opacity: 0;
+  pointer-events: none;
+}
+/* reduced motion: the page is simply there — no ceremony */
+@media (prefers-reduced-motion: reduce) {
+  .boot-seq {
+    display: none;
+  }
+}
+.boot-seq__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    52% 42% at 50% 46%,
+    color-mix(in srgb, var(--glow) 15%, transparent),
+    transparent 72%
+  );
+  animation: boot-glow 1.9s var(--ease-out) both;
+}
+@keyframes boot-glow {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.boot-seq__word {
+  position: relative;
+  display: flex;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 7rem);
+  letter-spacing: 0.12em;
+  line-height: 1;
+  color: var(--ink);
+}
+.boot-seq__word > span {
+  animation: boot-letter 0.7s var(--ease-out) both;
+}
+@keyframes boot-letter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.boot-seq__line {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  height: 1px;
+  width: min(46vw, 340px);
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: translateX(-50%) scaleX(0);
+  animation: boot-line 1s var(--ease-analog) 0.9s both;
+}
+@keyframes boot-line {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.9;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
 /* the closing colophon — fades in over the last stretch of scroll (--gp-about), covering
  * the spiral as the journey resolves. Interactive only once it's mostly up (data-groove-end). */
 .groove-world__about {
