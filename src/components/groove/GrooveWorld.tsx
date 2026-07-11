@@ -17,6 +17,7 @@
  * Reduced motion: no scrub — a normally-stacked, scrollable page (hero, then the spiral),
  * everything reachable; the controller no-ops.
  */
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { ERA_ORDER, useEraStore } from "@/lib/useEraStore";
@@ -27,6 +28,13 @@ import { DropNeedle } from "./DropNeedle";
 import { GrooveStage } from "./GrooveStage";
 import { HeroIntro } from "./HeroIntro";
 import { HeroNav } from "./HeroNav";
+
+// The shader light layer (15.2+): additive, deferred, ssr:false — never in the
+// load window; renders nothing wherever WebGL2 / motion isn't available.
+const GrooveGL = dynamic(() => import("./GrooveGL").then((m) => m.GrooveGL), {
+  ssr: false,
+  loading: () => null,
+});
 
 const DIVE_END = 0.42; // by here the camera is inside the grooves
 const ERA_TRAVEL_END = 0.8; // eras done; the closing "about" frame rises after this
@@ -128,6 +136,9 @@ export function GrooveWorld() {
 
         {/* the closing frame — fades in over the last stretch of scroll */}
         <AboutPanel />
+
+        {/* the shader light: lamp, dust, halo — and the tunnel during the dive */}
+        <GrooveGL />
       </div>
     </>
   );

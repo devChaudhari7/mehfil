@@ -156,6 +156,7 @@ export function GrooveStage({
               href="#groove"
               aria-hidden="true"
               tabIndex={-1}
+              data-gl-disc
               className="groove-zoom relative z-10 block cursor-pointer"
             >
               <MediumArtifact
