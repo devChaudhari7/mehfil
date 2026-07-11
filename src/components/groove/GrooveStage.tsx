@@ -137,8 +137,10 @@ export function GrooveStage({
 
       {/* The stage: brand · the morphing record · era caption · thesis + CTA · era picker */}
       <div className="relative z-10 flex flex-col items-center text-center">
-        {/* brand */}
-        <div data-intro className="flex flex-col items-center">
+        {/* brand — deliberately NOT part of the GSAP intro sweep: hiding the largest
+            text until a lazy script reveals it wrecks LCP, and the boot veil already
+            owns its entrance. The wordmark is simply, solidly there. */}
+        <div className="flex flex-col items-center">
           {intro}
           <p className="text-accent/80 mt-2.5 font-mono text-[10px] tracking-[0.36em] uppercase">
             The medium is the map

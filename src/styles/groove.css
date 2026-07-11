@@ -429,7 +429,10 @@ html[data-era-flash="90s"] .era-flash {
   z-index: 70;
   display: grid;
   place-items: center;
-  background: #050507;
+  /* NEAR-opaque, never opaque: a fully-occluding cover suppresses the hero's
+   * LCP paint record (Chrome ignores fully-hidden text) — 92% black reads
+   * identical on this stage but lets the hero paint through at first paint. */
+  background: rgba(5, 5, 7, 0.92);
   transition: opacity 0.6s var(--ease-out);
 }
 .boot-seq[data-leave="1"] {
@@ -472,19 +475,17 @@ html[data-era-flash="90s"] .era-flash {
   line-height: 1;
   color: var(--ink);
 }
+/* NOTE: letters never animate opacity or filter — they must be clean LCP paint
+ * candidates at first paint. The "resolve" is a pure rise (transform only). */
 .boot-seq__word > span {
   animation: boot-letter 0.7s var(--ease-out) both;
 }
 @keyframes boot-letter {
   from {
-    opacity: 0;
-    transform: translateY(14px);
-    filter: blur(6px);
+    transform: translateY(16px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 .boot-seq__line {

@@ -17,8 +17,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const KEY = "mehfil:booted";
-const RUN_MS = 1900;
-const LEAVE_MS = 650;
+const RUN_MS = 1500;
+const LEAVE_MS = 600;
 
 export function BootSequence() {
   const ref = useRef<HTMLDivElement>(null);
