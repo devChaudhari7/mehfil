@@ -15,8 +15,6 @@
     "ingest:dry": "tsx scripts/ingest/index.ts --dry-run"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
     "gsap": "^3.13.0",
     "howler": "^2.2.4",
     "lucide-react": "^0.563.0",
@@ -24,7 +22,6 @@
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "three": "^0.184.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

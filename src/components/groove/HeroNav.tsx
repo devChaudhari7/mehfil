@@ -15,6 +15,7 @@ export function HeroNav() {
       </p>
       <a
         href="#groove"
+        data-magnet
         className="cta-breathe bg-btn text-btn-ink rounded-full px-7 py-3 font-mono text-xs tracking-[0.22em] uppercase transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)] hover:brightness-110 active:translate-y-[2px]"
       >
         Travel the groove ↓

@@ -174,6 +174,75 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
+ * Phase 15 — the pointer system (fine pointers + motion allowed only;
+ * PointerRoot adds html.fine-cursor / html.has-pointer-fx).
+ * ------------------------------------------------------------------ */
+
+/* The stylus replaces the native arrow (text fields keep their caret UX). */
+html.fine-cursor *:not(input):not(textarea):not(select) {
+  cursor: none;
+}
+
+/* The lamp — a soft era-glow that follows the hand across every surface.
+   GrooveGL supersedes it visually when the shader layer is active. */
+.pointer-lamp {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    520px circle at var(--mx, 50vw) var(--my, 38vh),
+    color-mix(in srgb, var(--glow) 9%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+html.has-pointer-fx .pointer-lamp {
+  opacity: 1;
+}
+html[data-gl="1"] .pointer-lamp {
+  opacity: 0; /* the shader owns the light */
+}
+
+/* The stylus cursor: a tight dot + a lagging tonearm ring. */
+.needle-cursor-dot,
+.needle-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+html:not(.fine-cursor) .needle-cursor-dot,
+html:not(.fine-cursor) .needle-cursor-ring {
+  display: none;
+}
+.needle-cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--glow);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 60%, transparent);
+  transition: opacity 0.2s var(--ease-out);
+}
+.needle-cursor-ring {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 42%, transparent);
+  transition:
+    opacity 0.2s var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+.needle-cursor-ring[data-hover="1"] {
+  border-color: color-mix(in srgb, var(--accent) 85%, transparent);
+}
+
+/* ------------------------------------------------------------------ *
  * Reduced motion — CSS prong (defense in depth; JS prong in hooks).
  * Freeze grain + any spin/bloom; effects degrade even without JS.
  * ------------------------------------------------------------------ */

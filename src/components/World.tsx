@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { GrainOverlay } from "@/components/GrainOverlay";
+import { NeedleCursor } from "@/components/NeedleCursor";
+import { PointerRoot } from "@/components/PointerRoot";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { NowPlayingOverlay } from "@/components/player/NowPlayingOverlay";
 import { SearchPalette } from "@/components/search/SearchPalette";
@@ -35,6 +37,11 @@ export function World({ children }: { children: ReactNode }) {
       <NowPlayingOverlay />
       <SearchPalette />
       <GrooveTransitionRoot />
+
+      {/* Phase 15 pointer system: lamp vars + magnets (PointerRoot) + the stylus
+          cursor. Both no-op on coarse pointers / reduced motion. */}
+      <PointerRoot />
+      <NeedleCursor />
     </>
   );
 }

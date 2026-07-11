@@ -49,6 +49,7 @@ export function DropNeedle() {
       <div className="flex w-[min(92vw,640px)] flex-col items-center gap-3.5 text-center">
         <button
           type="button"
+          data-magnet
           onClick={() => usePlayerStore.getState().togglePlay()}
           aria-label={playing ? "Pause" : "Play"}
           className="bg-btn text-btn-ink inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-[11px] tracking-[0.2em] uppercase transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)] hover:brightness-110 active:translate-y-[1px]"
@@ -79,6 +80,7 @@ export function DropNeedle() {
     <div className="flex flex-col items-center gap-2.5 text-center">
       <button
         type="button"
+        data-magnet
         onClick={() => signature && playFromCollection(tracks, signature)}
         disabled={!playable}
         aria-label={playable ? `Drop the needle and play ${signature.title.latin}` : "No source yet"}

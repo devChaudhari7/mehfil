@@ -20,6 +20,7 @@
 import { useEffect } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { ERA_ORDER, useEraStore } from "@/lib/useEraStore";
+import { publishGrooveFrame } from "@/lib/grooveBus";
 import { SpiralNavigator } from "@/components/browse";
 import { AboutPanel } from "./AboutPanel";
 import { DropNeedle } from "./DropNeedle";
@@ -56,8 +57,10 @@ export function GrooveWorld() {
       const n = ERA_ORDER.length;
       const homeIdx = Math.max(ERA_ORDER.indexOf(useEraStore.getState().homeEra), 0);
       const et = clamp01((p - DIVE_END) / (ERA_TRAVEL_END - DIVE_END));
-      const steps = Math.min(Math.floor(et * n), n - 1);
-      const idx = (homeIdx + steps) % n;
+      const eraFloat = homeIdx + Math.min(et * n, n - 0.001);
+      const idx = Math.floor(eraFloat) % n;
+      // publish the frame for imperative consumers (year odometer, GrooveGL) — no renders
+      publishGrooveFrame({ p, dive, about, eraFloat });
       if (idx !== lastEra) {
         lastEra = idx;
         const era = ERA_ORDER[idx];

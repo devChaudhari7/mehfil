@@ -40,6 +40,7 @@ export function AboutPanel() {
           href="https://dc-taupe.vercel.app/"
           target="_blank"
           rel="noreferrer"
+          data-magnet
           className="group bg-btn text-btn-ink mt-1 inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-mono text-xs tracking-[0.2em] uppercase shadow-[0_10px_30px_rgba(0,0,0,0.4)] transition-[filter,transform] duration-[var(--dur-1)] ease-[var(--ease-analog)] hover:brightness-110 active:translate-y-[1px]"
         >
           Designed &amp; built by Dev Chaudhari

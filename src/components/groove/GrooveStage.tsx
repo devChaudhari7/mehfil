@@ -151,7 +151,7 @@ export function GrooveStage({
           style={{ width: MEDIUM_SIZE, height: MEDIUM_SIZE }}
         >
           <SynestheticBloom />
-          {tier !== "A" && size > 0 && (
+          {size > 0 && (
             <a
               href="#groove"
               aria-hidden="true"
