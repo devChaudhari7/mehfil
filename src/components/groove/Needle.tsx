@@ -43,7 +43,7 @@ export function Needle({ clock, visible, animated, size }: NeedleProps) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute top-[1%] right-[4%]"
+      className="needle-lift pointer-events-none absolute top-[1%] right-[4%]"
       style={{ opacity: visible ? 1 : 0, transition: "opacity var(--morph-dur) var(--ease-analog)" }}
     >
       <div ref={armRef} style={{ transformOrigin: "top right", transform: "rotate(-27deg)" }}>

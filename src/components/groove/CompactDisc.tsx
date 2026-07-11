@@ -20,6 +20,7 @@ export function CompactDisc({ spinning = false, size = 300, className }: Compact
 
   return (
     <div
+      data-tt-disc
       className={cx("relative shrink-0 rounded-full", className)}
       style={{
         width: size,

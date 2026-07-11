@@ -128,6 +128,39 @@ void main() {
     col += (wallCol * 0.6 + heartCol * 0.55 + uGlow * warp * 0.45) * tEnv;
   }
 
+  // ---- pass 3 · disc materials (15.4) -------------------------------------
+  // Light ON the record itself. Vinyl/shellac: an anisotropic sheen — the double
+  // gleam a real record throws toward a lamp, shimmering across micro-grooves.
+  // CD: thin-film iridescence, hue sweeping with the angle to the light.
+  // Cassette era: skipped (the DOM cassette isn't round); the lamp still reaches it.
+  if (uDisc.w > 0.5 && uDisc.z > 1.0) {
+    vec2 dq = uv - uDisc.xy;
+    float rn = length(dq) / uDisc.z; // 0 center → 1 rim
+    if (rn < 1.04) {
+      float dAngA = atan(dq.y, dq.x);
+      vec2 toP = uPointer - uDisc.xy;
+      float pAng = atan(toP.y, toP.x);
+      float rel = dAngA - pAng;
+      float grooveBand = smoothstep(0.30, 0.42, rn) * smoothstep(1.0, 0.93, rn);
+
+      if (uMedium < 0.5) {
+        // vinyl / shellac — main gleam toward the light + a dimmer counter-gleam
+        float toward = max(cos(rel), 0.0);
+        float away = max(-cos(rel), 0.0);
+        float rings = 0.72 + 0.28 * sin(rn * 320.0);
+        float glint = (pow(toward, 6.0) + pow(away, 8.0) * 0.35) * rings * grooveBand;
+        float reach = exp(-length(toP) / (uRes.y * 0.7));
+        col += mix(uGlow, vec3(1.0), 0.3) * glint * (0.08 + 0.22 * reach);
+      } else if (uMedium > 1.5) {
+        // compact disc — oil-slick wedges rotating with the hand
+        vec3 rainbow = 0.5 + 0.5 * cos(rel * 3.0 + rn * 14.0 + vec3(0.0, 2.094, 4.188));
+        float band = smoothstep(0.34, 0.48, rn) * smoothstep(1.0, 0.9, rn);
+        float wedge = pow(abs(cos(rel)), 2.0);
+        col += rainbow * band * wedge * 0.15;
+      }
+    }
+  }
+
   // ---- disc halo · breathes with the playing track's tempo ---------------
   if (uDisc.w > 0.5) {
     float dd = distance(uv, uDisc.xy);

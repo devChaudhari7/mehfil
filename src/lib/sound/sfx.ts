@@ -365,6 +365,54 @@ export function stopAmbience(): void {
   }
 }
 
+// --- the scratch voice (Phase 15.5) ---------------------------------------
+// A continuous band-passed noise bed whose gain/brightness follow how hard the
+// platter is being scratched. Raw Web Audio on Howler's context, routed through
+// Howler.masterGain so the global mute/volume govern it like everything else.
+
+let scratchNodes: { gain: GainNode; filter: BiquadFilterNode } | null = null;
+
+function ensureScratch(): { gain: GainNode; filter: BiquadFilterNode } | null {
+  if (scratchNodes) return scratchNodes;
+  const ctx = Howler.ctx;
+  if (!ctx) return null;
+  const seconds = 1;
+  const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  src.loop = true;
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = 900;
+  filter.Q.value = 0.9;
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+  const master = (Howler as unknown as { masterGain?: GainNode }).masterGain;
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(master ?? ctx.destination);
+  src.start();
+  scratchNodes = { gain, filter };
+  return scratchNodes;
+}
+
+/** Drive the scratch voice (0 = silent). Post-gesture + mute-aware. */
+export function setScratchIntensity(intensity: number): void {
+  const i = unlocked && !muted ? Math.min(Math.max(intensity, 0), 1) : 0;
+  if (!scratchNodes && i <= 0.001) return;
+  try {
+    const nodes = ensureScratch();
+    const ctx = Howler.ctx;
+    if (!nodes || !ctx) return;
+    nodes.gain.gain.setTargetAtTime(i * 0.2, ctx.currentTime, 0.05);
+    nodes.filter.frequency.setTargetAtTime(500 + 2400 * i, ctx.currentTime, 0.06);
+  } catch {
+    /* non-fatal */
+  }
+}
+
 export function applyMuted(value: boolean): void {
   muted = value;
   try {

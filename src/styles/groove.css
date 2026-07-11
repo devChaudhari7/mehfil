@@ -299,6 +299,32 @@ html[data-groove-phase="in"] .groove-world__hero {
   z-index: 20;
 }
 
+/* ------------------------------------------------------------------ *
+ * Phase 15 · the living record + pointer-lit materials
+ * ------------------------------------------------------------------ */
+
+/* Pointer-lit disc sheen — the CSS floor wherever GrooveGL isn't running.
+ * Positioned by the normalized pointer vars; the shader supersedes it. */
+.disc-live-sheen {
+  opacity: 0;
+  background: radial-gradient(
+    46% 46% at calc(var(--mxn, 0.5) * 100%) calc(var(--myn, 0.4) * 100%),
+    rgba(255, 255, 255, 0.13),
+    transparent 70%
+  );
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+html.has-pointer-fx:not([data-gl="1"]) .disc-live-sheen {
+  opacity: 1;
+}
+
+/* The needle lifts off the groove as the platter is scratched (--scratch is
+ * written per frame by TouchRecord; `translate` never fights the arm's rotate). */
+.needle-lift {
+  translate: 0 calc(var(--scratch, 0) * -9px);
+  transition: translate 90ms var(--ease-out);
+}
+
 /* the closing colophon — fades in over the last stretch of scroll (--gp-about), covering
  * the spiral as the journey resolves. Interactive only once it's mostly up (data-groove-end). */
 .groove-world__about {

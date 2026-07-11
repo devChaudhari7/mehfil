@@ -30,6 +30,7 @@ import { useRenderTier } from "@/lib/useRenderTier";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useInterpolatedTime } from "@/lib/useInterpolatedTime";
 import { SynestheticBloom } from "./SynestheticBloom";
+import { TouchRecord } from "./TouchRecord";
 
 const GrooveScene = dynamic(() => import("./GrooveScene").then((m) => m.GrooveScene), {
   ssr: false,
@@ -159,14 +160,18 @@ export function GrooveStage({
               data-gl-disc
               className="groove-zoom relative z-10 block cursor-pointer"
             >
-              <MediumArtifact
-                era={era}
-                spinning={heroAnimated}
-                showNeedle={showNeedle}
-                animated={heroAnimated}
-                clock={clock}
-                size={size}
-              />
+              {/* the living record: physics owns disc rotation (CSS spin stays only
+                  for cassette reels); a tap still scrolls into the groove */}
+              <TouchRecord medium={medium} spinning={heroAnimated}>
+                <MediumArtifact
+                  era={era}
+                  spinning={heroAnimated && medium === "cassette"}
+                  showNeedle={showNeedle}
+                  animated={heroAnimated}
+                  clock={clock}
+                  size={size}
+                />
+              </TouchRecord>
             </a>
           )}
         </div>

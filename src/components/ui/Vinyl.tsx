@@ -34,6 +34,7 @@ export function Vinyl({ spinning = false, size = 260, label, className }: VinylP
       aria-label="Vinyl record"
     >
       <div
+        data-tt-disc
         className="absolute inset-0 rounded-full"
         style={{
           background:
@@ -69,6 +70,12 @@ export function Vinyl({ spinning = false, size = 260, label, className }: VinylP
           />
         </span>
       </div>
+      {/* pointer-lit sheen — the CSS floor where GrooveGL isn't active. Outside the
+          rotating layer so the light stays still while the platter spins. */}
+      <span
+        aria-hidden="true"
+        className="disc-live-sheen pointer-events-none absolute inset-0 rounded-full"
+      />
     </div>
   );
 }
