@@ -80,6 +80,54 @@ void main() {
     col += uGlow * mote * vis * 0.45;
   }
 
+  // ---- pass 2 · the groove tunnel (15.3) ---------------------------------
+  // While the camera dives, you fly INTO the record: groove walls rush past,
+  // era light pours from the heart, dust streaks into warp lanes. Envelope
+  // ramps in early, peaks mid-dive, resolves away as the spiral appears —
+  // the DOM camera still carries the structure; this adds the flying-through.
+  float tEnv = smoothstep(0.03, 0.30, uDive) * (1.0 - smoothstep(0.72, 0.98, uDive));
+  if (tEnv > 0.001) {
+    vec2 tc = mix(uDisc.w > 0.5 ? uDisc.xy : uRes * 0.5, uRes * 0.5, smoothstep(0.0, 0.6, uDive));
+    vec2 q = uv - tc;
+    float r = max(length(q) / uRes.y, 1e-3);
+    float ang = atan(q.y, q.x);
+
+    // camera travel: scroll drives the flight; time keeps it alive mid-dive
+    float fly = uDive * 10.0 + uTime * 0.35;
+    float wobble = 1.0 + sin(ang * 3.0 + uTime * 0.6) * 0.03 + sin(ang * 7.0 - uTime * 0.4) * 0.012;
+    float depth = 0.30 / (r * wobble) + fly;
+
+    // groove walls — sharp ridges, motion-blurred when quality allows
+    float walls = 0.0;
+    if (uQuality > 0.5) {
+      for (float k = -1.0; k <= 1.0; k++) {
+        float f = fract(depth * 2.0 + k * 0.045);
+        walls += smoothstep(0.0, 0.35, f) * smoothstep(0.9, 0.55, f);
+      }
+      walls /= 3.0;
+    } else {
+      float f = fract(depth * 2.0);
+      walls = smoothstep(0.0, 0.35, f) * smoothstep(0.9, 0.55, f);
+    }
+
+    float fade = exp(-max(depth - fly, 0.0) * 0.35); // deeper walls sit darker
+    float open = smoothstep(0.05, 0.35, r);          // the heart stays open
+    vec3 wallCol = mix(uS1 * 2.4, uAccent, 0.35) * walls * fade * open;
+
+    // era light pouring from the heart of the record
+    float heart = exp(-r * 5.0);
+    vec3 heartCol = mix(uAccent, uGlow, 0.5) * heart * (0.5 + 0.2 * sin(uTime * 1.4));
+
+    // warp lanes — dust streaking past the camera
+    float lane = floor((ang + 3.14159) / 6.28318 * 72.0);
+    float ln = hash11(lane + 13.0);
+    float dash = fract(ln * 7.0 + depth * 0.45);
+    float warp = smoothstep(0.0, 0.12, dash) * smoothstep(0.30, 0.12, dash);
+    warp *= smoothstep(0.12, 0.45, r) * (0.3 + ln * 0.7);
+
+    col += (wallCol * 0.6 + heartCol * 0.55 + uGlow * warp * 0.45) * tEnv;
+  }
+
   // ---- disc halo · breathes with the playing track's tempo ---------------
   if (uDisc.w > 0.5) {
     float dd = distance(uv, uDisc.xy);
