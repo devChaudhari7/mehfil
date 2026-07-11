@@ -23,6 +23,9 @@ import { useReducedMotion } from "@/lib/useReducedMotion";
 import { ERA_ORDER, useEraStore } from "@/lib/useEraStore";
 import { publishGrooveFrame } from "@/lib/grooveBus";
 import { playTuningSweep } from "@/lib/sound/sfx";
+import { setDroneActive, setDroneEra } from "@/lib/sound/synth";
+import { useSoundStore } from "@/lib/sound/useSoundStore";
+import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { SpiralNavigator } from "@/components/browse";
 import { AboutPanel } from "./AboutPanel";
 import { DropNeedle } from "./DropNeedle";
@@ -110,6 +113,26 @@ export function GrooveWorld() {
       root.style.removeProperty("--gp-about");
     };
   }, [reduced]);
+
+  // The idle-world drone (15.7): era-tuned, whisper-quiet, and ONLY while the world
+  // is idle — the moment a track plays, it bows out and the ambience beds take over.
+  // Audio is independent of reduced motion (the sound layer's own contract); it is
+  // gesture-gated by construction (no AudioContext exists before the first unlock).
+  useEffect(() => {
+    const compute = () =>
+      useSoundStore.getState().unlocked && usePlayerStore.getState().status !== "playing";
+    setDroneEra(useEraStore.getState().era);
+    setDroneActive(compute());
+    const offEra = useEraStore.subscribe((s) => setDroneEra(s.era));
+    const offPlayer = usePlayerStore.subscribe(() => setDroneActive(compute()));
+    const offSound = useSoundStore.subscribe(() => setDroneActive(compute()));
+    return () => {
+      offEra();
+      offPlayer();
+      offSound();
+      setDroneActive(false); // leaving the world silences the score
+    };
+  }, []);
 
   if (reduced) {
     // Stacked, normally-scrollable fallback — scroll to the spiral and use it.
