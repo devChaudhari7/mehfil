@@ -22,12 +22,14 @@ import { useEffect } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { ERA_ORDER, useEraStore } from "@/lib/useEraStore";
 import { publishGrooveFrame } from "@/lib/grooveBus";
+import { playTuningSweep } from "@/lib/sound/sfx";
 import { SpiralNavigator } from "@/components/browse";
 import { AboutPanel } from "./AboutPanel";
 import { DropNeedle } from "./DropNeedle";
 import { GrooveStage } from "./GrooveStage";
 import { HeroIntro } from "./HeroIntro";
 import { HeroNav } from "./HeroNav";
+import { YearOdometer } from "./YearOdometer";
 
 // The shader light layer (15.2+): additive, deferred, ssr:false — never in the
 // load window; renders nothing wherever WebGL2 / motion isn't available.
@@ -49,6 +51,7 @@ export function GrooveWorld() {
     useEraStore.getState().loadHomeEra(); // apply the persisted landing era
     let raf = 0;
     let lastEra = -1;
+    let flashTimer = 0;
     const update = () => {
       raf = 0;
       const max = root.scrollHeight - window.innerHeight;
@@ -70,9 +73,22 @@ export function GrooveWorld() {
       // publish the frame for imperative consumers (year odometer, GrooveGL) — no renders
       publishGrooveFrame({ p, dive, about, eraFloat });
       if (idx !== lastEra) {
+        const isFirst = lastEra === -1;
         lastEra = idx;
         const era = ERA_ORDER[idx];
-        if (era) useEraStore.getState().setEra(era);
+        if (era) {
+          useEraStore.getState().setEra(era);
+          // crossing a decade: the dial sweeps + the era's texture flashes
+          // (never on the initial frame — arriving isn't traveling)
+          if (!isFirst) {
+            playTuningSweep();
+            root.dataset.eraFlash = era;
+            window.clearTimeout(flashTimer);
+            flashTimer = window.setTimeout(() => {
+              delete root.dataset.eraFlash;
+            }, 520);
+          }
+        }
       }
     };
     const onScroll = () => {
@@ -85,8 +101,10 @@ export function GrooveWorld() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
+      window.clearTimeout(flashTimer);
       delete root.dataset.groovePhase;
       delete root.dataset.grooveEnd;
+      delete root.dataset.eraFlash;
       root.style.removeProperty("--groove-p");
       root.style.removeProperty("--gp-dive");
       root.style.removeProperty("--gp-about");
@@ -123,7 +141,9 @@ export function GrooveWorld() {
           <GrooveStage intro={<HeroIntro />} nav={<HeroNav />} active />
         </div>
         <div className="groove-world__spiral">
-          <div className="w-full max-w-4xl">
+          {/* time machinery: the year rolls behind the spiral as you travel */}
+          <YearOdometer />
+          <div className="relative w-full max-w-4xl">
             {/* scroll owns the era at the eras level → don't let the spiral lift it too */}
             <SpiralNavigator active={false} />
           </div>
@@ -136,6 +156,10 @@ export function GrooveWorld() {
 
         {/* the closing frame — fades in over the last stretch of scroll */}
         <AboutPanel />
+
+        {/* era texture events: film-gate / bloom / CRT / digital, keyed by
+            html[data-era-flash] for ~half a second as you cross a decade */}
+        <div className="era-flash" aria-hidden="true" />
 
         {/* the shader light: lamp, dust, halo — and the tunnel during the dive */}
         <GrooveGL />

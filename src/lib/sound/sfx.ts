@@ -195,6 +195,29 @@ export function buildEnterGroove(): string {
   return samplesToWavDataUri(s);
 }
 
+/** Radio-tuning sweep (Phase 15.6): crossing a decade sounds like sweeping the dial —
+ *  a falling whistle through static, then the station catches with a soft blip. */
+export function buildTuningSweep(): string {
+  const dur = 0.34;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  let phase = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    const u = t / dur;
+    const env = Math.sin(Math.PI * Math.min(u, 1));
+    // falling carrier: 2800 → 380 Hz (exponential — reads as a dial sweep)
+    const freq = 2800 * Math.pow(380 / 2800, u);
+    phase += (2 * Math.PI * freq) / SAMPLE_RATE;
+    const whistle = Math.sin(phase) * 0.22;
+    const staticNoise = (Math.random() * 2 - 1) * 0.16;
+    // the station catches at the end
+    const blip = u > 0.82 ? Math.sin(2 * Math.PI * 920 * t) * Math.exp(-(u - 0.82) * 26) * 0.3 : 0;
+    s[i] = clamp((whistle + staticNoise) * env + blip);
+  }
+  return samplesToWavDataUri(s);
+}
+
 /** Era-change veil whoosh (Phase 12): a soft, low-passed swell — barely there. */
 export function buildVeilWhoosh(): string {
   const dur = 0.6;
@@ -238,10 +261,13 @@ let needleUri: string | null = null;
 let clunkUri: string | null = null;
 let enterUri: string | null = null;
 let veilUri: string | null = null;
+let sweepUri: string | null = null;
 let needle: Howl | null = null;
 let clunk: Howl | null = null;
 let enter: Howl | null = null;
 let veil: Howl | null = null;
+let sweep: Howl | null = null;
+let lastSweepAt = 0;
 const bedHowls: Partial<Record<AmbienceKind, Howl>> = {};
 let currentBed: AmbienceKind | null = null;
 let unlocked = false;
@@ -304,6 +330,22 @@ export function playEnterGroove(): void {
   try {
     ensureEnter();
     enter?.play();
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Radio-tuning sweep — crossing a decade on the scroll journey. Throttled so a
+ *  fast scrub through five eras reads as dial-spinning, not a siren. */
+export function playTuningSweep(): void {
+  if (!unlocked || muted) return;
+  const now = Date.now();
+  if (now - lastSweepAt < 380) return;
+  lastSweepAt = now;
+  try {
+    sweepUri ??= buildTuningSweep();
+    sweep ??= new Howl({ src: [sweepUri], format: ["wav"], volume: 0.3 });
+    sweep.play();
   } catch {
     /* non-fatal */
   }

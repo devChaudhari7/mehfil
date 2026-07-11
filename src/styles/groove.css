@@ -325,6 +325,101 @@ html.has-pointer-fx:not([data-gl="1"]) .disc-live-sheen {
   transition: translate 90ms var(--ease-out);
 }
 
+/* ------------------------------------------------------------------ *
+ * Phase 15.6 · time machinery
+ * ------------------------------------------------------------------ */
+
+/* The year odometer — four huge ghosted wheels rolling behind the spiral.
+ * Strips are moved per frame by the groove bus (transform-only, no layout). */
+.year-odometer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  display: flex;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 24vw, 17rem);
+  line-height: 1;
+  color: color-mix(in srgb, var(--ink) 7%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+.year-odometer__wheel {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+}
+.year-odometer__strip {
+  display: block;
+  will-change: transform;
+}
+.year-odometer__strip > span {
+  display: block;
+  height: 1em;
+  text-align: center;
+}
+
+/* Era texture events — a half-second flash keyed by html[data-era-flash] as you
+ * cross a decade: film-gate flicker → warm bloom → CRT scanlines → digital line.
+ * Reduced motion: the global block zeroes the animation (never appears). */
+.era-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+@keyframes era-flash-fade {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+html[data-era-flash="50s"] .era-flash {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 240, 200, 0.12) 0 2px,
+    transparent 2px 6px
+  );
+  animation: era-flash-fade 0.45s steps(4) both;
+}
+html[data-era-flash="60s"] .era-flash,
+html[data-era-flash="70s"] .era-flash {
+  background: radial-gradient(
+    62% 62% at 50% 45%,
+    color-mix(in srgb, var(--glow) 16%, transparent),
+    transparent 72%
+  );
+  animation: era-flash-fade 0.5s var(--ease-out) both;
+}
+html[data-era-flash="80s"] .era-flash {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(43, 214, 230, 0.12) 0 1px,
+    transparent 1px 3px,
+    rgba(240, 64, 127, 0.1) 3px 4px,
+    transparent 4px 6px
+  );
+  animation: era-flash-fade 0.4s steps(3) both;
+}
+html[data-era-flash="90s"] .era-flash {
+  background: linear-gradient(
+    180deg,
+    transparent 48%,
+    rgba(230, 241, 245, 0.35) 50%,
+    transparent 52%
+  );
+  animation: era-flash-fade 0.32s var(--ease-out) both;
+}
+
 /* the closing colophon — fades in over the last stretch of scroll (--gp-about), covering
  * the spiral as the journey resolves. Interactive only once it's mostly up (data-groove-end). */
 .groove-world__about {

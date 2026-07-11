@@ -56,3 +56,26 @@ export function yearFromEraFloat(eraFloat: number, eraCount = DECADE_START.lengt
   const fraction = eraFloat - Math.floor(eraFloat);
   return (DECADE_START[idx] ?? 1950) + fraction * 9.9;
 }
+
+/**
+ * Mechanical-odometer digit positions for a (possibly fractional) year:
+ * [thousands, hundreds, tens, units], each in [0, 10). The units wheel rolls
+ * continuously; higher wheels roll only while the wheel below sweeps 9 → 0
+ * (the classic carry), so 1959.95 reads as the 5 rolling into 6 mid-turn.
+ */
+export function odometerPositions(year: number): [number, number, number, number] {
+  const y = Math.max(year, 0);
+  const units = y % 10;
+  const carryU = Math.max(units - 9, 0); // 0→1 across the last tenth of the wheel
+  const tens = (Math.floor(y / 10) % 10) + carryU;
+  const carryT = Math.max(tens - 9, 0);
+  const hundreds = (Math.floor(y / 100) % 10) + carryT;
+  const carryH = Math.max(hundreds - 9, 0);
+  const thousands = (Math.floor(y / 1000) % 10) + carryH;
+  return [
+    Math.min(thousands, 10),
+    Math.min(hundreds, 10),
+    Math.min(tens, 10),
+    Math.min(units, 10),
+  ];
+}
