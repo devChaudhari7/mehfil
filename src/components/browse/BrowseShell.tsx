@@ -16,9 +16,16 @@ export function BrowseShell({
 }) {
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-12 sm:py-16">
-      <nav className="mb-10 flex items-center justify-between font-mono text-[11px] tracking-[0.18em] uppercase">
-        <GrooveLink href="/" className="text-ink/60 hover:text-accent underline-offset-4 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] hover:underline">
-          ← MEHFIL
+      {/* museum-label chrome (Phase 18 · Archive Edition) */}
+      <nav className="mb-12 flex items-center justify-between border-b border-white/10 pb-4 font-mono text-[11px] tracking-[0.18em] uppercase">
+        <GrooveLink
+          href="/"
+          className="text-ink/80 hover:text-accent flex items-baseline gap-3 transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)]"
+        >
+          <span className="font-display text-sm tracking-[0.34em]">MEHFIL</span>
+          <span className="text-ink/40 hidden font-mono text-[9px] tracking-[0.22em] sm:inline">
+            a retrospective of recorded sound · 1950 — now
+          </span>
         </GrooveLink>
         <div className="flex items-center gap-5">
           <GrooveLink
