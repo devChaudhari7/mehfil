@@ -206,11 +206,22 @@ describe("mergeCatalog — appendDiscoveries", () => {
     expect(diff.skipped).toBe(1);
   });
 
-  it("skips discoveries outside the 1950s–1990s scope", () => {
+  it("appends modern discoveries now that the eras span 1950s–2010s (Phase 16)", () => {
     const c = cand({
       videoId: "Y",
       sourceLanguage: "hindi",
       parsed: { song: "Modern Track", year: 2010, artist: "Artist" },
+    });
+    const { next, diff } = mergeCatalog(base([]), [c]);
+    expect(diff.appendedIds).toHaveLength(1);
+    expect(next.tracks.find((t) => t.sourceId === "Y")?.era).toBe("2010s");
+  });
+
+  it("still skips discoveries before the catalog's span (pre-1950)", () => {
+    const c = cand({
+      videoId: "Z",
+      sourceLanguage: "hindi",
+      parsed: { song: "Wax Cylinder Song", year: 1932, artist: "Artist" },
     });
     const { diff } = mergeCatalog(base([]), [c]);
     expect(diff.appendedIds).toEqual([]);

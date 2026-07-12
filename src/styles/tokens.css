@@ -158,3 +158,31 @@
   --btn-ink: #06222a; /* 9.34:1 (on-palette cyan; 90s omits --label) */
   --accent-paper: #155e6b; /* 5.24:1 on paper-deep */
 }
+
+[data-era="00s"] {
+  /* Digital · MP3 · glass and brushed silver, electric blue · compressed, crisp */
+  --s1: #1a2129;
+  --s2: #0a0e13;
+  --accent: #4fa8ff;
+  --accent2: #d7e3ee;
+  --ink: #eaf2f8;
+  --glow: #7cc0ff;
+  --grain: 0.04;
+  --btn: #4fa8ff;
+  --btn-ink: #06121f; /* ~7.1:1 */
+  --accent-paper: #14538f; /* ~5.2:1 on paper-deep */
+}
+
+[data-era="10s"] {
+  /* Streaming · Now · OLED black, violet/cyan gradient light · lossless silence */
+  --s1: #12101d;
+  --s2: #060609;
+  --accent: #a78bfa;
+  --accent2: #22d3ee;
+  --ink: #efeaff;
+  --glow: #c4b5fd;
+  --grain: 0.02;
+  --btn: #a78bfa;
+  --btn-ink: #191036; /* ~6.5:1 */
+  --accent-paper: #5936a8; /* ~5:1 on paper-deep */
+}

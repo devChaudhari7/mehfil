@@ -63,8 +63,12 @@ describe("eraFromYear", () => {
     expect(eraFromYear(1990)).toBe("1990s");
   });
 
-  it("returns null outside the 1950s–1990s scope", () => {
-    expect(eraFromYear(2005)).toBeNull();
+  it("accepts the modern decades (Phase 16: 1950s–2010s)", () => {
+    expect(eraFromYear(2005)).toBe("2000s");
+    expect(eraFromYear(2016)).toBe("2010s");
+  });
+
+  it("returns null outside the catalog's span", () => {
     expect(eraFromYear(1940)).toBeNull();
     expect(eraFromYear(Number.NaN)).toBeNull();
   });

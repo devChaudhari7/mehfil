@@ -43,18 +43,32 @@ export function subscribeGroove(fn: (f: GrooveFrame) => void): () => void {
   };
 }
 
-/** First year of each era band, in ERA_ORDER order (50s…90s). */
-const DECADE_START = [1950, 1960, 1970, 1980, 1990] as const;
+/** The year the "Now" band sweeps to — the journey literally ends today. */
+export const NOW_YEAR = new Date().getFullYear();
+
+/**
+ * Era bands in ERA_ORDER order (50s…10s). Uniform decades sweep ~9.9 years; the
+ * streaming band spans 2010 → the current year, so the odometer arrives at NOW.
+ */
+export const ERA_SPANS: readonly { start: number; span: number }[] = [
+  { start: 1950, span: 9.9 },
+  { start: 1960, span: 9.9 },
+  { start: 1970, span: 9.9 },
+  { start: 1980, span: 9.9 },
+  { start: 1990, span: 9.9 },
+  { start: 2000, span: 9.9 },
+  { start: 2010, span: Math.max(NOW_YEAR - 2010, 10) },
+];
 
 /**
  * Map the continuous era position to a rolling calendar year for the odometer:
- * the decade base of the active band + the fractional travel × 9.9 (so a band
- * sweeps 1950 → ~1959.9 before rolling into the next decade).
+ * the band's start year + the fractional travel × the band's span.
  */
-export function yearFromEraFloat(eraFloat: number, eraCount = DECADE_START.length): number {
+export function yearFromEraFloat(eraFloat: number, eraCount = ERA_SPANS.length): number {
   const idx = ((Math.floor(eraFloat) % eraCount) + eraCount) % eraCount;
   const fraction = eraFloat - Math.floor(eraFloat);
-  return (DECADE_START[idx] ?? 1950) + fraction * 9.9;
+  const band = ERA_SPANS[idx] ?? ERA_SPANS[0]!;
+  return band.start + fraction * band.span;
 }
 
 /**

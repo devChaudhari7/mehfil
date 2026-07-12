@@ -57,6 +57,8 @@ const DECADE_TO_ERA: Record<EraDecade, EraId> = {
   "1970s": "70s",
   "1980s": "80s",
   "1990s": "90s",
+  "2000s": "00s",
+  "2010s": "10s",
 };
 
 export function decadeToEraId(decade: EraDecade): EraId {

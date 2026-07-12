@@ -79,6 +79,12 @@ html {
 [data-era="90s"] .groove-display {
   letter-spacing: -0.01em;
 }
+[data-era="00s"] .groove-display {
+  letter-spacing: -0.02em;
+}
+[data-era="10s"] .groove-display {
+  letter-spacing: -0.03em;
+}
 
 /* ------------------------------------------------------------------ *
  * Spiral navigator zoom (Phase 5). Each level mount "zooms" in. The
@@ -243,7 +249,7 @@ html {
 .groove-spine {
   position: relative;
   z-index: 0;
-  height: 320vh;
+  height: 420vh; /* seven eras of travel (was 320vh at five) */
   pointer-events: none;
 }
 .groove-spine__anchor {
@@ -418,6 +424,47 @@ html[data-era-flash="90s"] .era-flash {
     transparent 52%
   );
   animation: era-flash-fade 0.32s var(--ease-out) both;
+}
+html[data-era-flash="00s"] .era-flash {
+  /* a pixel blip — one coarse checker frame, gone */
+  background:
+    repeating-linear-gradient(90deg, rgba(79, 168, 255, 0.12) 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(0deg, rgba(215, 227, 238, 0.08) 0 6px, transparent 6px 12px);
+  animation: era-flash-fade 0.28s steps(2) both;
+}
+html[data-era-flash="10s"] .era-flash {
+  /* the gradient age — a violet→cyan bloom pulse */
+  background: radial-gradient(
+    58% 58% at 50% 46%,
+    rgba(167, 139, 250, 0.16),
+    rgba(34, 211, 238, 0.08) 55%,
+    transparent 75%
+  );
+  animation: era-flash-fade 0.4s var(--ease-out) both;
+}
+
+/* ------------------------------------------------------------------ *
+ * Phase 16 · the digital-age artifacts (reduced motion zeroes both)
+ * ------------------------------------------------------------------ */
+/* the mp3 player's screen breathes while playing */
+@keyframes mp3-screen {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* the streaming waveform dances (per-bar staggered delays) */
+@keyframes wave-dance {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1.15);
+  }
 }
 
 /* ------------------------------------------------------------------ *

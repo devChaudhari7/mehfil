@@ -14,10 +14,10 @@ describe("useEraStore", () => {
     expect(document.documentElement.dataset.era).toBe("80s");
   });
 
-  it("next/prev clamp at the ends", () => {
-    useEraStore.getState().setEra("90s");
+  it("next/prev clamp at the ends (now 50s ↔ 10s)", () => {
+    useEraStore.getState().setEra("10s");
     useEraStore.getState().next();
-    expect(useEraStore.getState().era).toBe("90s");
+    expect(useEraStore.getState().era).toBe("10s");
 
     useEraStore.getState().setEra("50s");
     useEraStore.getState().prev();
@@ -25,5 +25,9 @@ describe("useEraStore", () => {
 
     useEraStore.getState().next();
     expect(useEraStore.getState().era).toBe("60s");
+
+    useEraStore.getState().setEra("90s");
+    useEraStore.getState().next();
+    expect(useEraStore.getState().era).toBe("00s"); // the timeline continues to now
   });
 });

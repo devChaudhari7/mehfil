@@ -10,8 +10,8 @@
  */
 import type { Script } from "@/lib/fonts";
 
-export type EraId = "50s" | "60s" | "70s" | "80s" | "90s";
-export type Medium = "shellac" | "vinyl" | "cassette" | "cd";
+export type EraId = "50s" | "60s" | "70s" | "80s" | "90s" | "00s" | "10s";
+export type Medium = "shellac" | "vinyl" | "cassette" | "cd" | "mp3" | "stream";
 
 export interface SeedTrack {
   native: string;
@@ -102,6 +102,34 @@ export const ERAS: readonly EraConfig[] = [
       native: "पहला नशा",
       latin: "Pehla Nasha",
       who: "Jatin–Lalit · 1992",
+      script: "devanagari",
+    },
+  },
+  {
+    id: "00s",
+    decade: "2000s",
+    medium: "mp3",
+    mediumLabel: "Digital · MP3",
+    rpm: "320 kbps",
+    soundTexture: "compressed, crisp",
+    seed: {
+      native: "कल हो ना हो",
+      latin: "Kal Ho Naa Ho",
+      who: "Sonu Nigam · 2003",
+      script: "devanagari",
+    },
+  },
+  {
+    id: "10s",
+    decade: "2010s",
+    medium: "stream",
+    mediumLabel: "Streaming · Now",
+    rpm: "∞",
+    soundTexture: "lossless silence",
+    seed: {
+      native: "कबीरा",
+      latin: "Kabira",
+      who: "Pritam · 2013",
       script: "devanagari",
     },
   },

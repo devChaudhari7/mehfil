@@ -44,7 +44,9 @@ export function TouchRecord({
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const draggedRef = useRef(false);
-  const isDisc = medium !== "cassette";
+  // Only round platters spin under the hand — cassettes and the digital-age
+  // artifacts (mp3 player, streaming slab) are inert passthroughs.
+  const isDisc = medium === "shellac" || medium === "vinyl" || medium === "cd";
 
   useEffect(() => {
     if (reduced || !isDisc) return;

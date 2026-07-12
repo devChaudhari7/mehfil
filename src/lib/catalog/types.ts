@@ -11,7 +11,15 @@ import type { Script } from "@/lib/fonts";
 
 export type { Script };
 
-export const ERA_DECADES = ["1950s", "1960s", "1970s", "1980s", "1990s"] as const;
+export const ERA_DECADES = [
+  "1950s",
+  "1960s",
+  "1970s",
+  "1980s",
+  "1990s",
+  "2000s",
+  "2010s",
+] as const;
 export type EraDecade = (typeof ERA_DECADES)[number];
 
 export const LANGUAGES = ["hindi", "punjabi", "bengali", "english"] as const;

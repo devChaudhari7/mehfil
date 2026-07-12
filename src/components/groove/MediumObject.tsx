@@ -13,6 +13,8 @@ import { Vinyl } from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { Cassette } from "./Cassette";
 import { CompactDisc } from "./CompactDisc";
+import { Mp3Player } from "./Mp3Player";
+import { StreamWave } from "./StreamWave";
 
 function Layer({ visible, children }: { visible: boolean; children: ReactNode }) {
   return (
@@ -53,6 +55,12 @@ export function MediumObject({ era, spinning, size, className }: MediumObjectPro
       </Layer>
       <Layer visible={medium === "cd"}>
         <CompactDisc spinning={spinning && medium === "cd"} size={size} />
+      </Layer>
+      <Layer visible={medium === "mp3"}>
+        <Mp3Player spinning={spinning && medium === "mp3"} size={size} />
+      </Layer>
+      <Layer visible={medium === "stream"}>
+        <StreamWave spinning={spinning && medium === "stream"} size={size} />
       </Layer>
     </div>
   );

@@ -18,7 +18,7 @@
 import type { EraId } from "@/lib/eras";
 import { int, makeRng, pick, range, shuffle } from "./rng";
 
-export type MotifFamily = "deco" | "modern" | "psych" | "neon" | "chrome";
+export type MotifFamily = "deco" | "modern" | "psych" | "neon" | "chrome" | "pixel" | "wave";
 export type TitlePos = "top" | "center" | "bottom";
 
 /** A title plate: a fill + its AA-paired ink (both era CSS-var roles). */
@@ -77,6 +77,8 @@ const FAMILY: Record<EraId, MotifFamily> = {
   "70s": "psych",
   "80s": "neon",
   "90s": "chrome",
+  "00s": "pixel", // digital-age: rounded pixel grid + gradient dots
+  "10s": "wave", // streaming-age: waveform bars over a gradient field
 };
 
 /** Dark field stops — present in every [data-era] block. */

@@ -24,7 +24,8 @@ import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const BPM = { slow: 72, mid: 96, fast: 126 } as const;
-const MEDIUM_ID = { shellac: 0, vinyl: 0, cassette: 1, cd: 2 } as const;
+// 0 = grooved disc (sheen pass) · 1 = non-disc (lamp only) · 2 = cd (thin-film)
+const MEDIUM_ID = { shellac: 0, vinyl: 0, cassette: 1, cd: 2, mp3: 1, stream: 1 } as const;
 
 type IdleWindow = Window & {
   requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;

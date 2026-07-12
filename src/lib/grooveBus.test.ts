@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getGrooveFrame,
+  NOW_YEAR,
   odometerPositions,
   publishGrooveFrame,
   subscribeGroove,
@@ -24,10 +25,12 @@ describe("groove frame bus", () => {
 });
 
 describe("yearFromEraFloat", () => {
-  it("maps band starts to decade starts", () => {
+  it("maps band starts to their start years (7 bands, 1950 → now)", () => {
     expect(yearFromEraFloat(0)).toBe(1950);
     expect(yearFromEraFloat(1)).toBe(1960);
     expect(yearFromEraFloat(4)).toBe(1990);
+    expect(yearFromEraFloat(5)).toBe(2000);
+    expect(yearFromEraFloat(6)).toBe(2010);
   });
 
   it("sweeps within a band toward the decade's end", () => {
@@ -36,16 +39,21 @@ describe("yearFromEraFloat", () => {
     expect(yearFromEraFloat(2.999)).toBeGreaterThan(1979.8);
   });
 
-  it("wraps past the last era back to the 50s (the groove loops)", () => {
-    expect(yearFromEraFloat(5)).toBe(1950); // homeIdx offsets can exceed the count
-    expect(yearFromEraFloat(6.5)).toBeCloseTo(1964.95, 2);
+  it("the Now band sweeps 2010 → the current year", () => {
+    expect(yearFromEraFloat(6.9999)).toBeGreaterThan(NOW_YEAR - 0.5);
+    expect(yearFromEraFloat(6.9999)).toBeLessThanOrEqual(NOW_YEAR + 0.01);
   });
 
-  it("never leaves the catalog's century", () => {
-    for (let f = 0; f < 10; f += 0.173) {
+  it("wraps past the last era back to the 50s (the groove loops)", () => {
+    expect(yearFromEraFloat(7)).toBe(1950); // homeIdx offsets can exceed the count
+    expect(yearFromEraFloat(8.5)).toBeCloseTo(1964.95, 2);
+  });
+
+  it("never leaves the catalog's span (1950 → now)", () => {
+    for (let f = 0; f < 14; f += 0.173) {
       const y = yearFromEraFloat(f);
       expect(y).toBeGreaterThanOrEqual(1950);
-      expect(y).toBeLessThan(2000);
+      expect(y).toBeLessThanOrEqual(NOW_YEAR + 0.01);
     }
   });
 });
@@ -70,8 +78,8 @@ describe("odometerPositions", () => {
     expect(t).toBeCloseTo(5.95, 5); // mid-carry into 6
   });
 
-  it("keeps every wheel inside [0, 10]", () => {
-    for (let y = 1950; y < 2000; y += 0.37) {
+  it("keeps every wheel inside [0, 10] across the full 1950→now span", () => {
+    for (let y = 1950; y < NOW_YEAR + 1; y += 0.37) {
       for (const p of odometerPositions(y)) {
         expect(p).toBeGreaterThanOrEqual(0);
         expect(p).toBeLessThanOrEqual(10);

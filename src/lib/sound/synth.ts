@@ -85,6 +85,26 @@ export const DRONE_PATCHES: Record<EraId, DronePatch> = {
       { type: "sine", freq: 880, gain: 0.16, lfoRate: 0.05, lfoDepth: 0.9 },
     ],
   },
+  "00s": {
+    // digital dawn: an FM-bell pad — clean sine stacks with a glassy fifth
+    cutoff: 1600,
+    level: 0.035,
+    voices: [
+      { type: "sine", freq: 220, gain: 0.4, lfoRate: 0.07, lfoDepth: 0.6 },
+      { type: "sine", freq: 440, detune: 4, gain: 0.26, lfoRate: 0.05, lfoDepth: 0.7 },
+      { type: "sine", freq: 660, gain: 0.12, lfoRate: 0.09, lfoDepth: 0.8 },
+    ],
+  },
+  "10s": {
+    // streaming now: sub-bass air + a faint high shimmer
+    cutoff: 3000,
+    level: 0.028,
+    voices: [
+      { type: "sine", freq: 55, gain: 0.55, lfoRate: 0.03, lfoDepth: 0.5 },
+      { type: "sine", freq: 110, gain: 0.3, lfoRate: 0.05, lfoDepth: 0.6 },
+      { type: "sine", freq: 1320, gain: 0.05, lfoRate: 0.08, lfoDepth: 0.95 },
+    ],
+  },
 };
 
 interface ActiveDrone {

@@ -291,6 +291,82 @@ function ChromeMotif({ spec }: { spec: ArtSpec }) {
   );
 }
 
+function PixelMotif({ spec }: { spec: ArtSpec }) {
+  const { roles, params } = spec;
+  // a rounded pixel grid, density from gridLines; a seeded diagonal of lit cells
+  const n = Math.max(params.gridLines, 6);
+  const cell = 100 / n;
+  const cells: React.ReactNode[] = [];
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      // deterministic sparse lighting from the already-seeded params
+      const v = Math.sin(x * 12.9898 + y * 78.233 + params.wavePhase) * 43758.5453;
+      const r = v - Math.floor(v);
+      if (r < 0.16) {
+        cells.push(
+          <rect
+            key={`${x}-${y}`}
+            x={f(x * cell + cell * 0.15)}
+            y={f(y * cell + cell * 0.15)}
+            width={f(cell * 0.7)}
+            height={f(cell * 0.7)}
+            rx={f(cell * 0.22)}
+            fill={r < 0.05 ? roles.highlight : roles.motif}
+            opacity={f(0.35 + r * 2.5)}
+          />,
+        );
+      }
+    }
+  }
+  return (
+    <>
+      <rect width="100" height="100" fill={roles.field} />
+      <rect width="100" height="100" fill={roles.field2} opacity="0.3" />
+      {cells}
+      <circle cx={f(params.originX * 100)} cy={f(params.originY * 100)} r="16" fill={roles.motifAlt} opacity="0.5" />
+    </>
+  );
+}
+
+function WaveMotif({ spec }: { spec: ArtSpec }) {
+  const { roles, params } = spec;
+  // a waveform of seeded bars across the center — the shape of a streamed song
+  const bars = Math.max(params.rays, 12);
+  const bw = 100 / (bars * 1.6);
+  const items: React.ReactNode[] = [];
+  for (let i = 0; i < bars; i++) {
+    const t = i / bars;
+    const h =
+      8 +
+      34 *
+        Math.abs(
+          Math.sin(t * Math.PI * 2.4 + params.wavePhase) *
+            Math.sin(t * Math.PI * 7 + params.rotate),
+        );
+    items.push(
+      <rect
+        key={i}
+        x={f(6 + t * 88)}
+        y={f(50 - h / 2)}
+        width={f(bw)}
+        height={f(h)}
+        rx={f(bw / 2)}
+        fill={i % 5 === 0 ? roles.highlight : roles.motif}
+        opacity={f(0.55 + 0.45 * Math.abs(Math.sin(t * 9 + params.wavePhase)))}
+      />,
+    );
+  }
+  return (
+    <>
+      <rect width="100" height="100" fill={roles.field} />
+      {/* the gradient-age field: two soft color pools */}
+      <circle cx={f(params.originX * 100)} cy="18" r="38" fill={roles.motifAlt} opacity="0.22" />
+      <circle cx={f(100 - params.originX * 100)} cy="86" r="44" fill={roles.highlight} opacity="0.12" />
+      {items}
+    </>
+  );
+}
+
 function Motif({ spec }: { spec: ArtSpec }) {
   switch (spec.family) {
     case "deco":
@@ -303,6 +379,10 @@ function Motif({ spec }: { spec: ArtSpec }) {
       return <NeonMotif spec={spec} />;
     case "chrome":
       return <ChromeMotif spec={spec} />;
+    case "pixel":
+      return <PixelMotif spec={spec} />;
+    case "wave":
+      return <WaveMotif spec={spec} />;
   }
 }
 

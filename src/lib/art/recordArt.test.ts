@@ -23,6 +23,8 @@ describe("buildArtSpec", () => {
       "70s": "psych",
       "80s": "neon",
       "90s": "chrome",
+      "00s": "pixel",
+      "10s": "wave",
     };
     for (const era of Object.keys(map) as EraId[]) {
       expect(familyForEra(era)).toBe(map[era]);
