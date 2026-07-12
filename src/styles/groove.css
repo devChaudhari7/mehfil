@@ -444,6 +444,44 @@ html[data-era-flash="10s"] .era-flash {
 }
 
 /* ------------------------------------------------------------------ *
+ * Phase 18 · the Archive Edition — the crate (Library cover-flow)
+ * ------------------------------------------------------------------ */
+.crate {
+  perspective: 1300px;
+  cursor: grab;
+}
+.crate:active {
+  cursor: grabbing;
+}
+.crate__sleeve {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(52vw, 300px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  transition:
+    transform var(--dur-3) var(--ease-analog),
+    opacity var(--dur-3) var(--ease-out);
+  will-change: transform;
+  /* reduced-motion fallback positioning (transforms are inline otherwise) */
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .crate__sleeve {
+    transform: translate(-50%, -50%) !important;
+  }
+}
+.crate__sleeve--front {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.65),
+    0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+/* ------------------------------------------------------------------ *
  * Phase 16 · the digital-age artifacts (reduced motion zeroes both)
  * ------------------------------------------------------------------ */
 /* the mp3 player's screen breathes while playing */

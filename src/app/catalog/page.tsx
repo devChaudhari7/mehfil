@@ -13,6 +13,7 @@ import { BrowseShell } from "@/components/browse";
 import { RecordArt } from "@/components/art";
 import { GrooveLink } from "@/components/GrooveLink";
 import { CatalogPlayButton } from "@/components/player/CatalogPlayButton";
+import { CrateDigger } from "@/components/library/CrateDigger";
 
 /*
  * /catalog — "The Library": the accessible, list-mode browse hub (the "Browse as
@@ -69,35 +70,38 @@ export default function LibraryPage() {
     <BrowseShell
       header={
         <>
-          <Mono className="text-accent">The Library</Mono>
+          <Mono className="text-accent">The Library · a retrospective of recorded sound</Mono>
           <Heading level={1} className="mt-4">
-            Every record
+            Dig the crate
           </Heading>
           <p className="text-ink/70 mt-3 font-body">
-            {tracks.length} records across five eras and four languages. Browse by zone, or
-            scan the full list below.
+            {tracks.length} records, 1950 to now, standing in one crate. Drag through the
+            years, open a drawer, or scan the pressing sheet below.
           </p>
         </>
       }
     >
-      <FacetRow label="By era">
+      {/* the crate — the whole century in cover-flow (Archive Edition) */}
+      <CrateDigger />
+
+      <FacetRow label="Drawers · by era">
         {ERA_DECADES.map((d) => (
           <Facet key={d} href={`/era/${d}`} label={d} count={eraCounts[d] ?? 0} />
         ))}
       </FacetRow>
-      <FacetRow label="By language">
+      <FacetRow label="Drawers · by language">
         {LANGUAGES.map((l) => (
           <Facet key={l} href={`/language/${l}`} label={LANGUAGE_LABEL[l] ?? l} count={langCounts[l] ?? 0} />
         ))}
       </FacetRow>
-      <FacetRow label="By region">
+      <FacetRow label="Drawers · by region">
         {REGIONS.map((r) => (
           <Facet key={r} href={`/region/${r}`} label={REGION_LABEL[r] ?? r} count={regionCounts[r] ?? 0} />
         ))}
       </FacetRow>
 
       <section aria-label="All records">
-        <Heading level={2}>All records ({tracks.length})</Heading>
+        <Heading level={2}>The pressing sheet ({tracks.length})</Heading>
         <div className="mt-5 overflow-x-auto rounded-2xl border border-white/10">
           <table className="w-full border-collapse text-left">
             <thead>
