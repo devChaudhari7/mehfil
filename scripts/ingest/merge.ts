@@ -146,6 +146,19 @@ export function mergeCatalog(
 
   // --- 2. appendDiscoveries ---
   const existingIds = new Set(base.tracks.map((t) => t.id));
+  // Re-run idempotence (17.1): a video already in the catalog must never append
+  // again. Discoveries carry no artists, so their seedKey is `song|` while the
+  // re-parsed candidate keys as `song|artist` — the key guard alone misses them
+  // and uniqueId would mint `…-2` duplicates every scheduled run. Two backstops:
+  //   a) videoId identity — the same upload is by definition already here;
+  //   b) song-only key for artist-less tracks — a different upload of the same
+  //      discovered song is still the same song.
+  const existingVideoIds = new Set(
+    base.tracks.map((t) => t.sourceId).filter((sid) => sid !== ""),
+  );
+  const songOnlyKeys = new Set(
+    base.tracks.filter((t) => t.artists.length === 0).map((t) => normalize(t.title.latin)),
+  );
   const appended: Track[] = [];
   const appendedIds: string[] = [];
   let skipped = 0;
@@ -157,6 +170,10 @@ export function mergeCatalog(
       continue;
     }
     const best = pickBest(group, undefined);
+    if (existingVideoIds.has(best.videoId) || songOnlyKeys.has(normalize(best.parsed.song))) {
+      skipped += 1; // already in the catalog from a previous run
+      continue;
+    }
     if (best.sourceLanguage === "multi") {
       skipped += 1; // can't classify a discovery's language from a multi source
       continue;
@@ -169,6 +186,8 @@ export function mergeCatalog(
     }
     const id = uniqueId(slugify(`${best.parsed.song}-${year}`), existingIds);
     existingIds.add(id);
+    existingVideoIds.add(best.videoId); // same-run duplicates under different keys
+    songOnlyKeys.add(normalize(best.parsed.song));
     appendedIds.push(id);
     appended.push(buildDiscoveryTrack(id, best, year, era, best.sourceLanguage));
   }

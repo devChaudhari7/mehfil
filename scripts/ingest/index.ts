@@ -13,7 +13,7 @@
  */
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { assertCatalogShape, type CatalogData } from "@/lib/catalog/types";
+import { assertCatalogShape } from "@/lib/catalog/types";
 import { LiveYouTubeClient } from "./client";
 import { FixtureYouTubeClient } from "./fixtures/client";
 import { keepVideo } from "./filter";
@@ -21,11 +21,10 @@ import { loadCheckpoint, ptDate, saveCheckpoint } from "./checkpoint";
 import { mergeCatalog } from "./merge";
 import { parseTitle } from "./parse";
 import { serializeCatalog } from "./serialize";
+import { CATALOG_PATH, ROOT, loadEnvLocal, readCatalog } from "./shared";
 import { SOURCES, type CatalogSource } from "./sources";
 import type { Candidate, Checkpoint, YouTubeClient } from "./types";
 
-const ROOT = process.cwd();
-const CATALOG_PATH = path.join(ROOT, "src", "data", "catalog.json");
 const OUT_DIR = path.join(ROOT, "scripts", "ingest", ".out");
 const OUT_PATH = path.join(OUT_DIR, "catalog.dry-run.json");
 
@@ -46,39 +45,6 @@ function parseArgs(argv: string[]): Args {
     else if (key === "--max-units" && value) args.maxUnits = Number(value);
   }
   return args;
-}
-
-async function readCatalog(): Promise<CatalogData> {
-  const data: unknown = JSON.parse(await fs.readFile(CATALOG_PATH, "utf8"));
-  assertCatalogShape(data);
-  return data;
-}
-
-/**
- * Minimal, dependency-free .env.local loader (KEY=VALUE per line). Keeps the
- * npm scripts plain `tsx` (no reliance on Node's --env-file flag) while still
- * giving the live run a place to put YOUTUBE_API_KEY. Absent file ⇒ dry-run.
- */
-async function loadEnvLocal(): Promise<void> {
-  if (process.env.YOUTUBE_API_KEY) return;
-  try {
-    const text = await fs.readFile(path.join(ROOT, ".env.local"), "utf8");
-    for (const line of text.split(/\r?\n/)) {
-      const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/);
-      if (!m) continue;
-      const key = m[1] as string;
-      let value = m[2] as string;
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-      if (!(key in process.env)) process.env[key] = value;
-    }
-  } catch {
-    /* no .env.local — fall through to dry-run */
-  }
 }
 
 interface Collected {
@@ -104,13 +70,27 @@ async function collectCandidates(
       console.warn(`! quota guard hit (${client.units}/${args.maxUnits} units) — stopping`);
       break;
     }
-    if (src.kind === "channel" && !src.id) {
+
+    // Handle-only entries resolve their channelId at run time (1 unit, once —
+    // the result is cached in the committed checkpoint's `handles` map).
+    let sourceId = src.id;
+    if (src.kind === "channel" && !sourceId && src.handle) {
+      sourceId = checkpoint?.handles?.[src.handle] ?? "";
+      if (!sourceId) {
+        sourceId = (await client.resolveHandle(src.handle)) ?? "";
+        if (sourceId && checkpoint) {
+          checkpoint.handles = { ...(checkpoint.handles ?? {}), [src.handle]: sourceId };
+        }
+      }
+    }
+    if (src.kind === "channel" && !sourceId) {
       console.warn(`- skip ${src.label}: channelId unresolved (handle ${src.handle})`);
       continue;
     }
+    if (src.kind === "playlist") sourceId = src.id;
 
     const playlistId =
-      src.kind === "channel" ? await client.getUploadsPlaylist(src.id) : src.id;
+      src.kind === "channel" ? await client.getUploadsPlaylist(sourceId) : sourceId;
     if (!playlistId) {
       console.warn(`- skip ${src.label}: no uploads playlist`);
       continue;
@@ -118,13 +98,13 @@ async function collectCandidates(
     sourcesProcessed += 1;
 
     const videoIds: string[] = [];
-    let pageToken = checkpoint?.perSource[src.id]?.pageToken;
+    let pageToken = checkpoint?.perSource[sourceId]?.pageToken;
     do {
       const page = await client.listPlaylistItems(playlistId, pageToken);
       videoIds.push(...page.videoIds);
       pageToken = page.nextPageToken;
     } while (pageToken && videoIds.length < args.limit && client.units < args.maxUnits);
-    perSourceTokens[src.id] = pageToken; // undefined ⇒ source exhausted
+    perSourceTokens[sourceId] = pageToken; // undefined ⇒ source exhausted
 
     const ids = videoIds.slice(0, args.limit);
     for (let i = 0; i < ids.length && client.units < args.maxUnits; i += 50) {
@@ -196,6 +176,7 @@ async function main(): Promise<void> {
         quotaDate: ptDate(),
         unitsSpent: checkpoint.unitsSpent + client.units,
         perSource,
+        ...(checkpoint.handles ? { handles: checkpoint.handles } : {}),
       });
     }
     outputPath = path.relative(ROOT, CATALOG_PATH);

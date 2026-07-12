@@ -227,6 +227,47 @@ describe("mergeCatalog — appendDiscoveries", () => {
     expect(diff.appendedIds).toEqual([]);
     expect(diff.skipped).toBe(1);
   });
+
+  it("is idempotent across scheduled re-runs (17.1 regression)", () => {
+    // First run appends the discovery (artists: [] on the built track).
+    const c = cand({
+      videoId: "V1",
+      sourceLanguage: "hindi",
+      parsed: { song: "Weekly Song", year: 1971, artist: "Some Singer" },
+    });
+    const first = mergeCatalog(base([]), [c]);
+    expect(first.diff.appendedIds).toHaveLength(1);
+
+    // Second run over the SAME uploads: the same candidate must NOT append again
+    // (previously key-mismatched to `song|` vs `song|artist` and minted `…-2`).
+    const second = mergeCatalog(first.next, [c]);
+    expect(second.diff.appendedIds).toEqual([]);
+    expect(second.next.tracks).toHaveLength(first.next.tracks.length);
+
+    // Even a DIFFERENT upload of the same discovered song stays out (song-only key).
+    const reupload = cand({
+      videoId: "V2",
+      sourceLanguage: "hindi",
+      parsed: { song: "Weekly Song", year: 1971, artist: "Other Channel Credit" },
+    });
+    const third = mergeCatalog(first.next, [reupload]);
+    expect(third.diff.appendedIds).toEqual([]);
+  });
+
+  it("collapses same-run duplicates of one song under different parsed artists", () => {
+    const a = cand({
+      videoId: "S1",
+      sourceLanguage: "hindi",
+      parsed: { song: "One Song", year: 1980, artist: "Credit A" },
+    });
+    const b = cand({
+      videoId: "S2",
+      sourceLanguage: "hindi",
+      parsed: { song: "One Song", year: 1980, artist: "Credit B" },
+    });
+    const { diff } = mergeCatalog(base([]), [a, b]);
+    expect(diff.appendedIds).toHaveLength(1);
+  });
 });
 
 /** Build candidates the way the runner does, but from the offline fixtures. */

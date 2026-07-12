@@ -35,7 +35,9 @@ yarn-error.log*
 .env*
 !.env.example
 
-# ingestion pipeline (local quota checkpoint + dry-run output)
+# ingestion pipeline (legacy local cache + dry-run output).
+# NOTE: scripts/ingest/state/ is deliberately COMMITTED — the scheduled CI run
+# resumes paging + handle resolutions from it across weeks.
 /scripts/ingest/.cache/
 /scripts/ingest/.out/
 

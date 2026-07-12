@@ -45,7 +45,10 @@ export interface PlaylistItemListResponse {
 }
 
 export interface ChannelListResponse {
-  items: Array<{ contentDetails: { relatedPlaylists: { uploads: string } } }>;
+  items: Array<{
+    id?: string;
+    contentDetails?: { relatedPlaylists: { uploads: string } };
+  }>;
 }
 
 // --- Pipeline working types ----------------------------------------------
@@ -85,6 +88,8 @@ export interface YouTubeClient {
   getUploadsPlaylist(channelId: string): Promise<string | null>;
   listPlaylistItems(playlistId: string, pageToken?: string): Promise<PlaylistPage>;
   listVideos(ids: string[]): Promise<RawVideo[]>;
+  /** Resolve an @handle to its channelId (1 unit; null when unknown). */
+  resolveHandle(handle: string): Promise<string | null>;
 }
 
 // --- Merge / run reporting -----------------------------------------------
@@ -110,4 +115,17 @@ export interface Checkpoint {
   quotaDate: string;
   unitsSpent: number;
   perSource: Record<string, SourceCheckpoint>;
+  /** @handle → channelId resolutions (one lookup ever, then cached here). */
+  handles?: Record<string, string>;
+}
+
+export interface RecheckDiff {
+  /** Resolved tracks whose status was fetched this run. */
+  checked: number;
+  /** Still public + embeddable. */
+  healthy: number;
+  /** Curated seeds whose dead resolver fields were reverted (re-resolvable). */
+  revertedSeedIds: string[];
+  /** Discovery tracks removed outright (their upload died). */
+  removedDiscoveryIds: string[];
 }

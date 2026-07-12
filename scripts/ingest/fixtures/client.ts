@@ -15,6 +15,10 @@ export class FixtureYouTubeClient implements YouTubeClient {
     return FIXTURES[channelId]?.uploads ?? null;
   }
 
+  async resolveHandle(): Promise<string | null> {
+    return null; // fixtures are keyed by channelId — handles stay offline-skipped
+  }
+
   async listPlaylistItems(playlistId: string): Promise<PlaylistPage> {
     const channel = Object.values(FIXTURES).find((c) => c.uploads === playlistId);
     return { videoIds: channel ? channel.items.map((i) => i.id) : [] };

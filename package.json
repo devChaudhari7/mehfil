@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "ingest": "tsx scripts/ingest/index.ts",
-    "ingest:dry": "tsx scripts/ingest/index.ts --dry-run"
+    "ingest:dry": "tsx scripts/ingest/index.ts --dry-run",
+    "recheck": "tsx scripts/ingest/recheck.cli.ts"
   },
   "dependencies": {
     "gsap": "^3.13.0",

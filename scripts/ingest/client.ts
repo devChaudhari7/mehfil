@@ -75,7 +75,15 @@ export class LiveYouTubeClient implements YouTubeClient {
       part: "contentDetails",
       id: channelId,
     });
-    return data.items[0]?.contentDetails.relatedPlaylists.uploads ?? null;
+    return data.items[0]?.contentDetails?.relatedPlaylists.uploads ?? null;
+  }
+
+  async resolveHandle(handle: string): Promise<string | null> {
+    const data = await this.get<ChannelListResponse>("channels", {
+      part: "id",
+      forHandle: handle.replace(/^@/, ""),
+    });
+    return data.items[0]?.id ?? null;
   }
 
   async listPlaylistItems(playlistId: string, pageToken?: string): Promise<PlaylistPage> {

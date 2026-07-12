@@ -1,0 +1,78 @@
+# MEHFIL — The Living Catalog (Phase 17).
+#
+# Weekly: ingest new tracks from the official-channel registry (embed-only,
+# metadata + videoIds — never media) and commit the grown catalog; Vercel
+# auto-deploys the push. Monthly (first Sunday): also re-check availability and
+# prune dead uploads. Fails closed: nothing is committed unless typecheck +
+# tests + the catalog shape guard all pass.
+#
+# Prerequisites (one-time, by the repo owner):
+#   1. Repo pushed to GitHub; Vercel connected to it.
+#   2. Actions secret YOUTUBE_API_KEY set (Settings → Secrets → Actions).
+#      Keep real keys out of committed files — .env.example carries a placeholder.
+#   3. Settings → Actions → General → Workflow permissions → "Read and write".
+
+name: catalog
+
+on:
+  schedule:
+    - cron: "0 2 * * 0" # Sundays 02:00 UTC — weekly ingest
+  workflow_dispatch:
+    inputs:
+      recheck:
+        description: "Also run the availability re-check"
+        type: boolean
+        default: false
+
+concurrency:
+  group: catalog
+  cancel-in-progress: false
+
+jobs:
+  grow:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Ingest (weekly growth)
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: npm run ingest -- --limit=400 --max-units=8000
+
+      - name: Availability re-check (first Sunday of the month, or on demand)
+        if: ${{ inputs.recheck || github.event_name == 'schedule' }}
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          DOM=$(date -u +%d)
+          if [ "${{ inputs.recheck }}" = "true" ] || [ "$DOM" -le 07 ]; then
+            npm run recheck
+          else
+            echo "skip: re-check runs on the first Sunday of the month"
+          fi
+
+      # Fail closed — a broken catalog never ships.
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Commit the grown catalog
+        run: |
+          git config user.name "mehfil-catalog[bot]"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/data/catalog.json scripts/ingest/state/
+          if git diff --cached --quiet; then
+            echo "catalog unchanged — nothing to commit"
+          else
+            TRACKS=$(node -e "console.log(require('./src/data/catalog.json').tracks.length)")
+            git commit -m "chore(catalog): scheduled ingest — $TRACKS tracks"
+            git push
+          fi

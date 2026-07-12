@@ -1,0 +1,18 @@
+{
+  "quotaDate": "2026-06-24",
+  "unitsSpent": 27,
+  "perSource": {
+    "UC_A7K2dXFsTMAciGmnNxy-Q": {
+      "pageToken": "EAAaH1BUOkNNZ0JJaEF4UTBSQ1JEUTVRalF5UlRSQlJFTTM",
+      "lastRun": "2026-06-24T23:36:59.465Z"
+    },
+    "UCP6uH_XlsxrXwZQ4DlqbqPg": {
+      "pageToken": "EAAaH1BUOkNNZ0JJaEExUkVRMU5VSkNPVGRETVRreFJEQXk",
+      "lastRun": "2026-06-24T23:36:59.465Z"
+    },
+    "UCsuSg5nYeDwNJQ4_TKsZa8w": {
+      "pageToken": "EAAaH1BUOkNNZ0JJaEEzTURVM1JVVXpPVVpHT1VSRFEwRTM",
+      "lastRun": "2026-06-24T23:36:59.465Z"
+    }
+  }
+}
