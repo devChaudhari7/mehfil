@@ -75,7 +75,8 @@ export class LiveYouTubeClient implements YouTubeClient {
       part: "contentDetails",
       id: channelId,
     });
-    return data.items[0]?.contentDetails?.relatedPlaylists.uploads ?? null;
+    // NOTE: on no match the API omits `items` entirely (not an empty array).
+    return data.items?.[0]?.contentDetails?.relatedPlaylists.uploads ?? null;
   }
 
   async resolveHandle(handle: string): Promise<string | null> {
@@ -83,7 +84,7 @@ export class LiveYouTubeClient implements YouTubeClient {
       part: "id",
       forHandle: handle.replace(/^@/, ""),
     });
-    return data.items[0]?.id ?? null;
+    return data.items?.[0]?.id ?? null;
   }
 
   async listPlaylistItems(playlistId: string, pageToken?: string): Promise<PlaylistPage> {
@@ -93,7 +94,7 @@ export class LiveYouTubeClient implements YouTubeClient {
       playlistId,
       ...(pageToken ? { pageToken } : {}),
     });
-    const videoIds = data.items
+    const videoIds = (data.items ?? [])
       .map((it) => it.contentDetails?.videoId ?? it.snippet?.resourceId?.videoId)
       .filter((id): id is string => Boolean(id));
     return { videoIds, ...(data.nextPageToken ? { nextPageToken: data.nextPageToken } : {}) };
@@ -106,6 +107,6 @@ export class LiveYouTubeClient implements YouTubeClient {
       part: "snippet,contentDetails,status,statistics",
       id: ids.join(","),
     });
-    return data.items.map(mapVideoItem);
+    return (data.items ?? []).map(mapVideoItem);
   }
 }

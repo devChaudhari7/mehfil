@@ -47,4 +47,15 @@ describe("keepVideo", () => {
     expect(keepVideo(raw({ title: "Best of Rafi | Audio Jukebox" }))).toBe(false);
     expect(keepVideo(raw({ title: "Mehbooba Mehbooba #shorts" }))).toBe(false);
   });
+
+  it("drops movie-length uploads (label channels post full films between songs)", () => {
+    expect(keepVideo(raw({ durationSec: 2 * 3600 }))).toBe(false);
+    expect(keepVideo(raw({ durationSec: 14 * 60 }))).toBe(true); // a long song is fine
+  });
+
+  it("drops full-movie / scene / dialogue titles", () => {
+    expect(keepVideo(raw({ title: "ACP Prithviraj Singh Action Full Movie" }))).toBe(false);
+    expect(keepVideo(raw({ title: "Sholay — Best Scene HD" }))).toBe(false);
+    expect(keepVideo(raw({ title: "Gabbar Famous Dialogue" }))).toBe(false);
+  });
 });

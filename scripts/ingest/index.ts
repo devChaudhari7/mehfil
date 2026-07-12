@@ -71,58 +71,66 @@ async function collectCandidates(
       break;
     }
 
-    // Handle-only entries resolve their channelId at run time (1 unit, once —
-    // the result is cached in the committed checkpoint's `handles` map).
-    let sourceId = src.id;
-    if (src.kind === "channel" && !sourceId && src.handle) {
-      sourceId = checkpoint?.handles?.[src.handle] ?? "";
-      if (!sourceId) {
-        sourceId = (await client.resolveHandle(src.handle)) ?? "";
-        if (sourceId && checkpoint) {
-          checkpoint.handles = { ...(checkpoint.handles ?? {}), [src.handle]: sourceId };
+    // One broken source (bad handle, deleted channel, 404 playlist) must not kill
+    // the whole 19-source run — warn and continue. Quota exhaustion still aborts.
+    try {
+      // Handle-only entries resolve their channelId at run time (1 unit, once —
+      // the result is cached in the committed checkpoint's `handles` map).
+      let sourceId = src.id;
+      if (src.kind === "channel" && !sourceId && src.handle) {
+        sourceId = checkpoint?.handles?.[src.handle] ?? "";
+        if (!sourceId) {
+          sourceId = (await client.resolveHandle(src.handle)) ?? "";
+          if (sourceId && checkpoint) {
+            checkpoint.handles = { ...(checkpoint.handles ?? {}), [src.handle]: sourceId };
+          }
         }
       }
-    }
-    if (src.kind === "channel" && !sourceId) {
-      console.warn(`- skip ${src.label}: channelId unresolved (handle ${src.handle})`);
-      continue;
-    }
-    if (src.kind === "playlist") sourceId = src.id;
-
-    const playlistId =
-      src.kind === "channel" ? await client.getUploadsPlaylist(sourceId) : sourceId;
-    if (!playlistId) {
-      console.warn(`- skip ${src.label}: no uploads playlist`);
-      continue;
-    }
-    sourcesProcessed += 1;
-
-    const videoIds: string[] = [];
-    let pageToken = checkpoint?.perSource[sourceId]?.pageToken;
-    do {
-      const page = await client.listPlaylistItems(playlistId, pageToken);
-      videoIds.push(...page.videoIds);
-      pageToken = page.nextPageToken;
-    } while (pageToken && videoIds.length < args.limit && client.units < args.maxUnits);
-    perSourceTokens[sourceId] = pageToken; // undefined ⇒ source exhausted
-
-    const ids = videoIds.slice(0, args.limit);
-    for (let i = 0; i < ids.length && client.units < args.maxUnits; i += 50) {
-      const videos = await client.listVideos(ids.slice(i, i + 50));
-      for (const v of videos) {
-        if (!keepVideo(v)) {
-          filtered += 1;
-          continue;
-        }
-        candidates.push({
-          ...v,
-          parsed: parseTitle(v.title),
-          sourceLabel: src.label,
-          sourceLanguage: src.language,
-          sourceRegion: src.region,
-          trusted: src.trusted,
-        });
+      if (src.kind === "channel" && !sourceId) {
+        console.warn(`- skip ${src.label}: channelId unresolved (handle ${src.handle})`);
+        continue;
       }
+      if (src.kind === "playlist") sourceId = src.id;
+
+      const playlistId =
+        src.kind === "channel" ? await client.getUploadsPlaylist(sourceId) : sourceId;
+      if (!playlistId) {
+        console.warn(`- skip ${src.label}: no uploads playlist`);
+        continue;
+      }
+      sourcesProcessed += 1;
+
+      const videoIds: string[] = [];
+      let pageToken = checkpoint?.perSource[sourceId]?.pageToken;
+      do {
+        const page = await client.listPlaylistItems(playlistId, pageToken);
+        videoIds.push(...page.videoIds);
+        pageToken = page.nextPageToken;
+      } while (pageToken && videoIds.length < args.limit && client.units < args.maxUnits);
+      perSourceTokens[sourceId] = pageToken; // undefined ⇒ source exhausted
+
+      const ids = videoIds.slice(0, args.limit);
+      for (let i = 0; i < ids.length && client.units < args.maxUnits; i += 50) {
+        const videos = await client.listVideos(ids.slice(i, i + 50));
+        for (const v of videos) {
+          if (!keepVideo(v)) {
+            filtered += 1;
+            continue;
+          }
+          candidates.push({
+            ...v,
+            parsed: parseTitle(v.title),
+            sourceLabel: src.label,
+            sourceLanguage: src.language,
+            sourceRegion: src.region,
+            trusted: src.trusted,
+          });
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/quota/i.test(msg) || msg.includes(" 403")) throw err; // quota → abort the run
+      console.warn(`- skip ${src.label}: ${msg.slice(0, 160)}`);
     }
   }
 
