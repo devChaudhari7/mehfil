@@ -12,18 +12,22 @@ import { cx } from "@/lib/cx";
 import { useDebouncedValue } from "./useDebouncedValue";
 import { useCatalogSearch } from "./useCatalogSearch";
 import { SearchResults } from "./SearchResults";
+import { TunerStrip } from "./TunerStrip";
 
 export function SearchBox({
   initialQuery = "",
   autoFocus = false,
   onSelect,
   onQueryChange,
+  tuner = false,
   className,
 }: {
   initialQuery?: string;
   autoFocus?: boolean;
   onSelect?: () => void;
   onQueryChange?: (q: string) => void;
+  /** Show the tuner band (the /search route; the ⌘K palette stays compact). */
+  tuner?: boolean;
   className?: string;
 }) {
   const [query, setQuery] = useState(initialQuery);
@@ -54,6 +58,11 @@ export function SearchBox({
           className="text-ink placeholder:text-ink/40 w-full bg-transparent font-body outline-none"
         />
       </div>
+      {tuner && (
+        <div className="mt-5">
+          <TunerStrip results={results} query={debounced} />
+        </div>
+      )}
       <div className="mt-6">
         <SearchResults results={results} query={debounced} onSelect={onSelect} />
       </div>

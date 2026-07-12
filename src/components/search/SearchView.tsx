@@ -23,5 +23,5 @@ export function SearchView() {
     [router, pathname],
   );
 
-  return <SearchBox initialQuery={initial} autoFocus onQueryChange={onQueryChange} />;
+  return <SearchBox initialQuery={initial} autoFocus tuner onQueryChange={onQueryChange} />;
 }
