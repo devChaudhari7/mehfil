@@ -10,7 +10,8 @@ import {
 } from "@/lib/catalog";
 import { getEra } from "@/lib/eras";
 import { Heading, Mono } from "@/components/ui";
-import { AlbumHero, BrowseShell, SetEra, TrackList } from "@/components/browse";
+import { BrowseShell, SetEra } from "@/components/browse";
+import { Gatefold } from "@/components/browse/Gatefold";
 
 /*
  * /album/[id] — a film soundtrack as an album (films-as-albums, derived at read
@@ -73,13 +74,10 @@ export default async function AlbumPage({ params }: { params: Promise<{ id: stri
           </>
         }
       >
-        <section aria-label="Album record" className="flex justify-center">
-          <AlbumHero release={release} rpm={cfg.rpm} />
-        </section>
-
-        <section aria-label="Tracklist">
-          <Heading level={2}>Tracklist</Heading>
-          <TrackList tracks={tracks} className="mt-6" />
+        {/* the gatefold: cover opens on its hinge → liner notes + the pressing
+            sheet inside; the vinyl slides out (Phase 18 · Archive + Instrument) */}
+        <section aria-label="The record" className="flex justify-center py-6">
+          <Gatefold release={release} tracks={tracks} rpm={cfg.rpm} />
         </section>
       </BrowseShell>
     </>
