@@ -85,6 +85,9 @@ html {
 [data-era="10s"] .groove-display {
   letter-spacing: -0.03em;
 }
+[data-era="20s"] .groove-display {
+  letter-spacing: -0.035em;
+}
 
 /* ------------------------------------------------------------------ *
  * Spiral navigator zoom (Phase 5). Each level mount "zooms" in. The
@@ -441,6 +444,16 @@ html[data-era-flash="10s"] .era-flash {
     transparent 75%
   );
   animation: era-flash-fade 0.4s var(--ease-out) both;
+}
+html[data-era-flash="20s"] .era-flash {
+  /* the aurora — a mint/coral sheet rippling once */
+  background: linear-gradient(
+    120deg,
+    rgba(52, 229, 184, 0.12),
+    rgba(255, 122, 158, 0.1) 55%,
+    transparent 80%
+  );
+  animation: era-flash-fade 0.45s var(--ease-out) both;
 }
 
 /* ------------------------------------------------------------------ *

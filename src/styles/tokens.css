@@ -174,7 +174,7 @@
 }
 
 [data-era="10s"] {
-  /* Streaming · Now · OLED black, violet/cyan gradient light · lossless silence */
+  /* Streaming · OLED black, violet/cyan gradient light · lossless silence */
   --s1: #12101d;
   --s2: #060609;
   --accent: #a78bfa;
@@ -185,4 +185,18 @@
   --btn: #a78bfa;
   --btn-ink: #191036; /* ~6.5:1 */
   --accent-paper: #5936a8; /* ~5:1 on paper-deep */
+}
+
+[data-era="20s"] {
+  /* Streaming · Now · aurora on true black — mint/coral light · algorithmic hush */
+  --s1: #0b1210;
+  --s2: #040606;
+  --accent: #34e5b8;
+  --accent2: #ff7a9e;
+  --ink: #e9f7f1;
+  --glow: #7ff2d4;
+  --grain: 0.015;
+  --btn: #34e5b8;
+  --btn-ink: #04241b; /* ~9:1 */
+  --accent-paper: #0f6e55; /* ~5:1 on paper-deep */
 }

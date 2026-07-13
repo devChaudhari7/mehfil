@@ -80,13 +80,26 @@ export function parseTitle(
   };
 }
 
-/** ASCII-fold for matching: strip diacritics, lowercase, drop non-alphanumerics. */
+/**
+ * Fold for matching: strip diacritics, lowercase, drop punctuation/whitespace —
+ * KEEPING letters of every script (Phase 19: Saregama-style channels title many
+ * uploads in Devanagari/Gurmukhi/Bengali; ASCII-only folding erased those to ""
+ * and silently dropped them before the merge).
+ */
 export function normalize(s: string): string {
   return s
     .normalize("NFD")
     .replace(COMBINING_MARKS, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "");
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
+/** Detect the writing system of a title (drives language inference + rendering). */
+export function scriptOf(text: string): "devanagari" | "gurmukhi" | "bengali" | "latin" {
+  if (/[ऀ-ॿ]/.test(text)) return "devanagari";
+  if (/[਀-੿]/.test(text)) return "gurmukhi";
+  if (/[ঀ-৿]/.test(text)) return "bengali";
+  return "latin";
 }
 
 /** Dedupe / match key = normalized song + primary artist. */

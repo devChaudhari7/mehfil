@@ -30,6 +30,7 @@ const ERA_AMBIENCE: Record<EraId, AmbienceKind> = {
   "90s": "cd",
   "00s": "cd", // digital eras share the near-silent floor
   "10s": "cd",
+  "20s": "cd",
 };
 
 const LANG: Record<Script, string> = {

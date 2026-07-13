@@ -34,7 +34,7 @@ export function EraPicker() {
                 on ? "bg-btn text-btn-ink" : "text-ink/45 hover:text-ink hover:bg-white/5",
               )}
             >
-              {e.id === "10s" ? "Now" : e.decade.slice(0, 4)}
+              {e.id === "20s" ? "Now" : e.decade.slice(0, 4)}
             </button>
           );
         })}

@@ -25,12 +25,13 @@ describe("groove frame bus", () => {
 });
 
 describe("yearFromEraFloat", () => {
-  it("maps band starts to their start years (7 bands, 1950 → now)", () => {
+  it("maps band starts to their start years (8 bands, 1950 → now)", () => {
     expect(yearFromEraFloat(0)).toBe(1950);
     expect(yearFromEraFloat(1)).toBe(1960);
     expect(yearFromEraFloat(4)).toBe(1990);
     expect(yearFromEraFloat(5)).toBe(2000);
     expect(yearFromEraFloat(6)).toBe(2010);
+    expect(yearFromEraFloat(7)).toBe(2020);
   });
 
   it("sweeps within a band toward the decade's end", () => {
@@ -39,18 +40,18 @@ describe("yearFromEraFloat", () => {
     expect(yearFromEraFloat(2.999)).toBeGreaterThan(1979.8);
   });
 
-  it("the Now band sweeps 2010 → the current year", () => {
-    expect(yearFromEraFloat(6.9999)).toBeGreaterThan(NOW_YEAR - 0.5);
-    expect(yearFromEraFloat(6.9999)).toBeLessThanOrEqual(NOW_YEAR + 0.01);
+  it("the Now band sweeps 2020 → the current year", () => {
+    expect(yearFromEraFloat(7.9999)).toBeGreaterThan(NOW_YEAR - 0.5);
+    expect(yearFromEraFloat(7.9999)).toBeLessThanOrEqual(NOW_YEAR + 0.01);
   });
 
   it("wraps past the last era back to the 50s (the groove loops)", () => {
-    expect(yearFromEraFloat(7)).toBe(1950); // homeIdx offsets can exceed the count
-    expect(yearFromEraFloat(8.5)).toBeCloseTo(1964.95, 2);
+    expect(yearFromEraFloat(8)).toBe(1950); // homeIdx offsets can exceed the count
+    expect(yearFromEraFloat(9.5)).toBeCloseTo(1964.95, 2);
   });
 
   it("never leaves the catalog's span (1950 → now)", () => {
-    for (let f = 0; f < 14; f += 0.173) {
+    for (let f = 0; f < 16; f += 0.173) {
       const y = yearFromEraFloat(f);
       expect(y).toBeGreaterThanOrEqual(1950);
       expect(y).toBeLessThanOrEqual(NOW_YEAR + 0.01);

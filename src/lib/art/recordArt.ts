@@ -79,6 +79,7 @@ const FAMILY: Record<EraId, MotifFamily> = {
   "90s": "chrome",
   "00s": "pixel", // digital-age: rounded pixel grid + gradient dots
   "10s": "wave", // streaming-age: waveform bars over a gradient field
+  "20s": "wave", // the streaming age continues — its palette tells it apart
 };
 
 /** Dark field stops — present in every [data-era] block. */

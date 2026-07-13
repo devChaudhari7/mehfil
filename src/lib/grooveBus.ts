@@ -57,7 +57,8 @@ export const ERA_SPANS: readonly { start: number; span: number }[] = [
   { start: 1980, span: 9.9 },
   { start: 1990, span: 9.9 },
   { start: 2000, span: 9.9 },
-  { start: 2010, span: Math.max(NOW_YEAR - 2010, 10) },
+  { start: 2010, span: 9.9 },
+  { start: 2020, span: Math.max(NOW_YEAR - 2020, 5) },
 ];
 
 /**

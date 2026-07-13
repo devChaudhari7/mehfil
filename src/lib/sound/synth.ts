@@ -96,13 +96,24 @@ export const DRONE_PATCHES: Record<EraId, DronePatch> = {
     ],
   },
   "10s": {
-    // streaming now: sub-bass air + a faint high shimmer
+    // streaming: sub-bass air + a faint high shimmer
     cutoff: 3000,
     level: 0.028,
     voices: [
       { type: "sine", freq: 55, gain: 0.55, lfoRate: 0.03, lfoDepth: 0.5 },
       { type: "sine", freq: 110, gain: 0.3, lfoRate: 0.05, lfoDepth: 0.6 },
       { type: "sine", freq: 1320, gain: 0.05, lfoRate: 0.08, lfoDepth: 0.95 },
+    ],
+  },
+  "20s": {
+    // now: the sub deepens, a glassy fifth floats above — the algorithmic hush
+    cutoff: 3400,
+    level: 0.026,
+    voices: [
+      { type: "sine", freq: 41, gain: 0.5, lfoRate: 0.025, lfoDepth: 0.45 },
+      { type: "sine", freq: 82, gain: 0.32, lfoRate: 0.04, lfoDepth: 0.55 },
+      { type: "sine", freq: 123, gain: 0.14, lfoRate: 0.06, lfoDepth: 0.7 },
+      { type: "sine", freq: 1760, gain: 0.04, lfoRate: 0.07, lfoDepth: 0.95 },
     ],
   },
 };

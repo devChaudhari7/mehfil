@@ -16,8 +16,16 @@
  *                     stable slug ids, deduped, never clobbering an existing id.
  */
 import type { Artist, CatalogData, Language, Track } from "@/lib/catalog/types";
-import { dedupeKey, eraFromYear, normalize, slugify } from "./parse";
+import { dedupeKey, eraFromYear, normalize, scriptOf, slugify } from "./parse";
 import type { Candidate, MergeDiff } from "./types";
+
+/** Native script → language, for classifying discoveries from "multi" channels. */
+const SCRIPT_LANGUAGE: Record<string, Language | null> = {
+  devanagari: "hindi",
+  gurmukhi: "punjabi",
+  bengali: "bengali",
+  latin: null, // a Latin title on a multi channel stays unclassifiable
+};
 
 function primaryArtistLatin(track: Track, artistsById: Map<string, Artist>): string {
   const id = track.artists[0];
@@ -70,7 +78,7 @@ function buildDiscoveryTrack(
   return {
     id,
     title: { native: best.parsed.song, latin: best.parsed.song },
-    script: "latin",
+    script: scriptOf(best.parsed.song),
     artists: [],
     film: best.parsed.film ?? null,
     albumId: null,
@@ -174,8 +182,14 @@ export function mergeCatalog(
       skipped += 1; // already in the catalog from a previous run
       continue;
     }
-    if (best.sourceLanguage === "multi") {
-      skipped += 1; // can't classify a discovery's language from a multi source
+    // "multi" channels (Saregama & co.) title much of the vault in native script —
+    // infer the language from the writing system; Latin-titled multi stays skipped.
+    const language: Language | null =
+      best.sourceLanguage === "multi"
+        ? (SCRIPT_LANGUAGE[scriptOf(best.parsed.song)] ?? null)
+        : best.sourceLanguage;
+    if (language === null) {
+      skipped += 1;
       continue;
     }
     const year = best.parsed.year;
@@ -184,12 +198,13 @@ export function mergeCatalog(
       skipped += 1; // need an in-scope year to assign an era
       continue;
     }
-    const id = uniqueId(slugify(`${best.parsed.song}-${year}`), existingIds);
+    const slug = slugify(`${best.parsed.song}-${year}`) || `yt-${best.videoId.toLowerCase()}`;
+    const id = uniqueId(slug, existingIds);
     existingIds.add(id);
     existingVideoIds.add(best.videoId); // same-run duplicates under different keys
     songOnlyKeys.add(normalize(best.parsed.song));
     appendedIds.push(id);
-    appended.push(buildDiscoveryTrack(id, best, year, era, best.sourceLanguage));
+    appended.push(buildDiscoveryTrack(id, best, year, era, language));
   }
 
   const next: CatalogData = { ...base, tracks: [...nextTracks, ...appended] };

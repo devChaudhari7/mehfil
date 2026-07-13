@@ -10,7 +10,7 @@
  */
 import type { Script } from "@/lib/fonts";
 
-export type EraId = "50s" | "60s" | "70s" | "80s" | "90s" | "00s" | "10s";
+export type EraId = "50s" | "60s" | "70s" | "80s" | "90s" | "00s" | "10s" | "20s";
 export type Medium = "shellac" | "vinyl" | "cassette" | "cd" | "mp3" | "stream";
 
 export interface SeedTrack {
@@ -123,13 +123,27 @@ export const ERAS: readonly EraConfig[] = [
     id: "10s",
     decade: "2010s",
     medium: "stream",
-    mediumLabel: "Streaming · Now",
+    mediumLabel: "Streaming",
     rpm: "∞",
     soundTexture: "lossless silence",
     seed: {
       native: "कबीरा",
       latin: "Kabira",
       who: "Pritam · 2013",
+      script: "devanagari",
+    },
+  },
+  {
+    id: "20s",
+    decade: "2020s",
+    medium: "stream",
+    mediumLabel: "Streaming · Now",
+    rpm: "∞",
+    soundTexture: "algorithmic hush",
+    seed: {
+      native: "केसरिया",
+      latin: "Kesariya",
+      who: "Arijit Singh · 2022",
       script: "devanagari",
     },
   },

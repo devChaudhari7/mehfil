@@ -195,7 +195,7 @@ describe("mergeCatalog — appendDiscoveries", () => {
     expect(d.source).toBe("youtube");
   });
 
-  it("skips discoveries from multi-language sources", () => {
+  it("skips LATIN-titled discoveries from multi-language sources (unclassifiable)", () => {
     const c = cand({
       videoId: "M",
       sourceLanguage: "multi",
@@ -204,6 +204,35 @@ describe("mergeCatalog — appendDiscoveries", () => {
     const { diff } = mergeCatalog(base([]), [c]);
     expect(diff.appendedIds).toEqual([]);
     expect(diff.skipped).toBe(1);
+  });
+
+  it("classifies multi-source discoveries by their native script (Phase 19)", () => {
+    const hindi = cand({
+      videoId: "H1",
+      sourceLanguage: "multi",
+      parsed: { song: "आ जा रे परदेसी", year: 1958, artist: "लता मंगेशकर" },
+    });
+    const bengali = cand({
+      videoId: "B1",
+      sourceLanguage: "multi",
+      parsed: { song: "এই রাত তোমার আমার", year: 1959, artist: "হেমন্ত" },
+    });
+    const punjabi = cand({
+      videoId: "P1",
+      sourceLanguage: "multi",
+      parsed: { song: "ਜੁਗਨੀ", year: 1970, artist: "ਕੋਈ" },
+    });
+    const { next, diff } = mergeCatalog(base([]), [hindi, bengali, punjabi]);
+    expect(diff.appendedIds).toHaveLength(3);
+    const byVid = (v: string) => next.tracks.find((t) => t.sourceId === v)!;
+    expect(byVid("H1").language).toBe("hindi");
+    expect(byVid("H1").script).toBe("devanagari");
+    expect(byVid("B1").language).toBe("bengali");
+    expect(byVid("B1").script).toBe("bengali");
+    expect(byVid("P1").language).toBe("punjabi");
+    expect(byVid("P1").script).toBe("gurmukhi");
+    // ids never collapse to empty slugs for native-script titles
+    for (const id of diff.appendedIds) expect(id.length).toBeGreaterThan(0);
   });
 
   it("appends modern discoveries now that the eras span 1950s–2010s (Phase 16)", () => {

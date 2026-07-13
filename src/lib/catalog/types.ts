@@ -19,6 +19,7 @@ export const ERA_DECADES = [
   "1990s",
   "2000s",
   "2010s",
+  "2020s",
 ] as const;
 export type EraDecade = (typeof ERA_DECADES)[number];
 
