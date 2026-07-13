@@ -147,35 +147,41 @@ export function GrooveStage({
           </p>
         </div>
 
-        {/* the morphing record — a scroll cue into the grooves */}
+        {/* the morphing record — starts TUCKED IN ITS KRAFT INNER SLEEVE; beginning
+            the journey (scroll) physically pulls it free of the jacket, the ritual
+            before every play. Pure CSS on --gp-dive (scrub-reversible). */}
         <div
           ref={boxRef}
-          className="relative mt-4 grid place-items-center sm:mt-5"
+          className="record-pull-stage relative mt-4 grid place-items-center sm:mt-5"
           style={{ width: MEDIUM_SIZE, height: MEDIUM_SIZE }}
         >
           <SynestheticBloom />
           {size > 0 && (
-            <a
-              href="#groove"
-              aria-hidden="true"
-              tabIndex={-1}
-              data-gl-disc
-              className="groove-zoom relative z-10 block cursor-pointer"
-            >
-              {/* the living record: physics owns disc rotation (CSS spin stays only
-                  for cassette reels); a tap still scrolls into the groove */}
-              <TouchRecord medium={medium} spinning={heroAnimated}>
-                <MediumArtifact
-                  era={era}
-                  spinning={heroAnimated && medium === "cassette"}
-                  showNeedle={showNeedle}
-                  animated={heroAnimated}
-                  clock={clock}
-                  size={size}
-                />
-              </TouchRecord>
-            </a>
+            <div className="record-pull relative z-10">
+              <a
+                href="#groove"
+                aria-hidden="true"
+                tabIndex={-1}
+                data-gl-disc
+                className="groove-zoom block cursor-pointer"
+              >
+                {/* the living record: physics owns disc rotation (CSS spin stays only
+                    for cassette reels); a tap still scrolls into the groove */}
+                <TouchRecord medium={medium} spinning={heroAnimated}>
+                  <MediumArtifact
+                    era={era}
+                    spinning={heroAnimated && medium === "cassette"}
+                    showNeedle={showNeedle}
+                    animated={heroAnimated}
+                    clock={clock}
+                    size={size}
+                  />
+                </TouchRecord>
+              </a>
+            </div>
           )}
+          {/* the jacket — in front, covering the disc's right; slides away as you pull */}
+          {size > 0 && <div aria-hidden="true" className="record-jacket" />}
         </div>
 
         {/* era caption — updates as the world morphs through time */}

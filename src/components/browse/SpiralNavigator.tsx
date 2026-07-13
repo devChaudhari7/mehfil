@@ -338,8 +338,9 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
               />
               {focused && (
                 <p
+                  key={focused.title}
                   className={cx(
-                    "text-ink mt-2 text-3xl leading-tight sm:text-4xl",
+                    "jukebox-flip text-ink mt-2 text-3xl leading-tight sm:text-4xl",
                     focused.script ? scriptFont(focused.script).display : "font-display",
                   )}
                 >
@@ -347,7 +348,11 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
                 </p>
               )}
               {focused?.sub && (
-                <p className="text-ink/70 mt-2 font-mono text-[11px] tracking-[0.14em]">
+                <p
+                  key={focused.sub}
+                  className="jukebox-flip text-ink/70 mt-2 font-mono text-[11px] tracking-[0.14em]"
+                  style={{ animationDelay: "60ms" }}
+                >
                   {focused.sub}
                 </p>
               )}

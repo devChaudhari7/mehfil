@@ -461,6 +461,80 @@ html[data-era-flash="20s"] .era-flash {
  * PointerRoot writes --tilt-x/--tilt-y (lerped) on [data-tilt] elements;
  * each surface folds the vars into its own transform.
  * ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ *
+ * Phase 22 · object rituals — the record pulls free of its inner sleeve.
+ * --pull completes across the FIRST quarter of the dive; scrubbing back
+ * tucks the record in again. All calc on --gp-dive; zero JS.
+ * ------------------------------------------------------------------ */
+.record-pull-stage {
+  --pull: min(calc(var(--gp-dive, 0) * 4), 1);
+}
+/* at rest the disc peeks out of the jacket to the left; pulling centres it */
+.record-pull {
+  transform: translateX(calc(-7% + var(--pull) * 7%));
+}
+.record-jacket {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  width: 102%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  border-radius: 8px;
+  /* kraft paper + the die-cut thumb arc + bottom shade */
+  background:
+    radial-gradient(circle at 18% 50%, rgba(20, 12, 4, 0.16) 0 10%, transparent 11%),
+    linear-gradient(155deg, #e3cea6 0%, #c6aa7a 55%, #a98d60 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    inset 0 -16px 34px rgba(0, 0, 0, 0.2),
+    14px 26px 60px rgba(0, 0, 0, 0.45);
+  /* slides right + fades as the record is pulled free */
+  transform: translate(calc(-50% + 32% + var(--pull) * 85%), -50%)
+    rotate(calc(1.5deg + var(--pull) * 6deg));
+  opacity: calc(1 - var(--pull) * 1.15);
+}
+.record-jacket::after {
+  content: "MEHFIL · INNER SLEEVE · 1950 — NOW";
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: rgba(58, 40, 18, 0.55);
+}
+/* the stacked reduced-motion world never scrubs — no jacket there */
+.groove-world--static .record-jacket {
+  display: none;
+}
+.groove-world--static .record-pull {
+  transform: none;
+}
+
+/* the jukebox strip: crossing a decade flips the hub card mechanically —
+ * hinged at the bottom, overshoots a touch, settles (the Wurlitzer flip) */
+@keyframes jukebox-flip {
+  0% {
+    opacity: 0;
+    transform: perspective(420px) rotateX(88deg);
+  }
+  62% {
+    opacity: 1;
+    transform: perspective(420px) rotateX(-7deg);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(420px) rotateX(0deg);
+  }
+}
+.jukebox-flip {
+  display: block;
+  transform-origin: 50% 100%;
+  animation: jukebox-flip var(--dur-3) var(--ease-analog) both;
+}
+
 /* the era caption flips like a split-flap line when time changes */
 @keyframes caption-flip {
   from {
