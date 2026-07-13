@@ -178,6 +178,52 @@ body {
  * PointerRoot adds html.fine-cursor / html.has-pointer-fx).
  * ------------------------------------------------------------------ */
 
+/* The stylus cursor — the cartridge needle you hold. Native arrow hides only
+   while it is live (text fields keep their caret). Position is NEVER eased
+   (zero lag); only rotation/dip animate. */
+html.stylus-live *:not(input):not(textarea):not(select) {
+  cursor: none;
+}
+.stylus-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s var(--ease-out);
+}
+.stylus-cursor__body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: -8px 0 0 -4px; /* the diamond tip sits ~on the hotspot */
+  transition: filter var(--dur-1) var(--ease-out);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+}
+.stylus-cursor[data-landed="1"] .stylus-cursor__body {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+.stylus-cursor__contact {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--glow) 45%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--glow) 60%, transparent);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
+}
+.stylus-cursor[data-landed="1"] .stylus-cursor__contact {
+  opacity: 1;
+  transform: scale(2.6);
+}
+
 /* The lamp — a soft era-glow that follows the hand across every surface.
    GrooveGL supersedes it visually when the shader layer is active. */
 .pointer-lamp {

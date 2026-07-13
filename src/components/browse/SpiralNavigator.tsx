@@ -33,6 +33,7 @@ import { canPlay, playFromCollection } from "@/lib/player/playFromCollection";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { nodePoints, pointAt, type SpiralOpts } from "@/lib/spiral";
 import { cx } from "@/lib/cx";
+import { TimeArm } from "./TimeArm";
 
 const ALL_TRACKS = catalogRepository.allTracks();
 const GEOM: SpiralOpts = { turns: 2.6, minR: 16, maxR: 46 };
@@ -132,7 +133,14 @@ function listHref(level: Level, era: EraId, releaseId?: string): string {
   return `/era/${getEra(era).decade}`;
 }
 
-export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
+export function SpiralNavigator({
+  active = true,
+  timeArm = false,
+}: {
+  active?: boolean;
+  /** Show the scroll-driven tonearm riding the groove (home world only). */
+  timeArm?: boolean;
+} = {}) {
   const tier = useRenderTier();
   const reduced = useReducedMotion();
   const storeEra = useEraStore((s) => s.era);
@@ -311,6 +319,9 @@ export function SpiralNavigator({ active = true }: { active?: boolean } = {}) {
               strokeWidth="0.4"
             />
           </svg>
+
+          {/* the tonearm playing the record of time (scroll-driven) */}
+          {timeArm && <TimeArm />}
 
           {/* central hub disc — you're standing inside the record. Also the
               shared-element target the home/album record morphs into (Phase 12). */}

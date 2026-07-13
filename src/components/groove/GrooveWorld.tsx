@@ -168,7 +168,7 @@ export function GrooveWorld() {
           <YearOdometer />
           <div className="relative w-full max-w-4xl">
             {/* scroll owns the era at the eras level → don't let the spiral lift it too */}
-            <SpiralNavigator active={false} />
+            <SpiralNavigator active={false} timeArm />
           </div>
           {/* the payoff — drop the needle on the era you've traveled to (clears the
               floating player bar) */}

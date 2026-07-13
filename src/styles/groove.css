@@ -462,56 +462,42 @@ html[data-era-flash="20s"] .era-flash {
  * each surface folds the vars into its own transform.
  * ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ *
- * Phase 22 · object rituals — the record pulls free of its inner sleeve.
- * --pull completes across the FIRST quarter of the dive; scrubbing back
- * tucks the record in again. All calc on --gp-dive; zero JS.
+ * Phase 23 · the record changer — era changes are a physical act.
+ * The new artifact DROPS onto the platter and settles with a bounce;
+ * the old one falls off the spindle. Reduced motion: instant swap.
  * ------------------------------------------------------------------ */
-.record-pull-stage {
-  --pull: min(calc(var(--gp-dive, 0) * 4), 1);
+@keyframes changer-drop {
+  0% {
+    transform: translateY(-105%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  58% {
+    transform: translateY(3.5%);
+  }
+  80% {
+    transform: translateY(-1.6%);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
-/* at rest the disc peeks out of the jacket to the left; pulling centres it */
-.record-pull {
-  transform: translateX(calc(-7% + var(--pull) * 7%));
+.changer-drop {
+  animation: changer-drop 0.6s var(--ease-analog) both;
 }
-.record-jacket {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 20;
-  width: 102%;
-  aspect-ratio: 1;
+@keyframes changer-fall {
+  to {
+    transform: translateY(55%) rotate(6deg);
+    opacity: 0;
+  }
+}
+.changer-fall {
   pointer-events: none;
-  border-radius: 8px;
-  /* kraft paper + the die-cut thumb arc + bottom shade */
-  background:
-    radial-gradient(circle at 18% 50%, rgba(20, 12, 4, 0.16) 0 10%, transparent 11%),
-    linear-gradient(155deg, #e3cea6 0%, #c6aa7a 55%, #a98d60 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
-    inset 0 -16px 34px rgba(0, 0, 0, 0.2),
-    14px 26px 60px rgba(0, 0, 0, 0.45);
-  /* slides right + fades as the record is pulled free */
-  transform: translate(calc(-50% + 32% + var(--pull) * 85%), -50%)
-    rotate(calc(1.5deg + var(--pull) * 6deg));
-  opacity: calc(1 - var(--pull) * 1.15);
+  animation: changer-fall 0.55s cubic-bezier(0.5, 0, 0.9, 0.4) both;
 }
-.record-jacket::after {
-  content: "MEHFIL · INNER SLEEVE · 1950 — NOW";
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 0.18em;
-  color: rgba(58, 40, 18, 0.55);
-}
-/* the stacked reduced-motion world never scrubs — no jacket there */
-.groove-world--static .record-jacket {
-  display: none;
-}
-.groove-world--static .record-pull {
-  transform: none;
-}
+
 
 /* the jukebox strip: crossing a decade flips the hub card mechanically —
  * hinged at the bottom, overshoots a touch, settles (the Wurlitzer flip) */

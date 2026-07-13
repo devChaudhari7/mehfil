@@ -23,12 +23,13 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { GrooveLink } from "@/components/GrooveLink";
 import { EraPicker } from "./EraPicker";
-import { getEra } from "@/lib/eras";
+import { getEra, type EraId } from "@/lib/eras";
 import { useEraStore } from "@/lib/useEraStore";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
 import { useRenderTier } from "@/lib/useRenderTier";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useInterpolatedTime } from "@/lib/useInterpolatedTime";
+import { playCassetteClunk } from "@/lib/sound/sfx";
 import { SynestheticBloom } from "./SynestheticBloom";
 import { TouchRecord } from "./TouchRecord";
 
@@ -37,6 +38,10 @@ const GrooveScene = dynamic(() => import("./GrooveScene").then((m) => m.GrooveSc
   loading: () => null,
 });
 const MediumArtifact = dynamic(() => import("./MediumArtifact").then((m) => m.MediumArtifact), {
+  ssr: false,
+  loading: () => null,
+});
+const MediumObject = dynamic(() => import("./MediumObject").then((m) => m.MediumObject), {
   ssr: false,
   loading: () => null,
 });
@@ -78,6 +83,22 @@ export function GrooveStage({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  // THE RECORD CHANGER (Phase 23): switching eras is a physical act — the old
+  // artifact falls off the spindle while the new one drops on and settles with
+  // a bounce (+ the mechanical clunk, only while the hero is on stage).
+  const prevEraRef = useRef(era);
+  const [falling, setFalling] = useState<EraId | null>(null);
+  useEffect(() => {
+    const prev = prevEraRef.current;
+    if (prev === era) return;
+    prevEraRef.current = era;
+    if (reduced) return;
+    setFalling(prev);
+    if (document.documentElement.dataset.groovePhase !== "in") playCassetteClunk();
+    const t = window.setTimeout(() => setFalling(null), 650);
+    return () => window.clearTimeout(t);
+  }, [era, reduced]);
 
   // One GSAP load sequence rises the text in (lazy; skipped under reduced motion).
   useEffect(() => {
@@ -147,17 +168,21 @@ export function GrooveStage({
           </p>
         </div>
 
-        {/* the morphing record — starts TUCKED IN ITS KRAFT INNER SLEEVE; beginning
-            the journey (scroll) physically pulls it free of the jacket, the ritual
-            before every play. Pure CSS on --gp-dive (scrub-reversible). */}
+        {/* the record changer — era changes DROP the next artifact onto the
+            platter (bounce-settle) while the old one falls away */}
         <div
           ref={boxRef}
-          className="record-pull-stage relative mt-4 grid place-items-center sm:mt-5"
+          className="relative mt-4 grid place-items-center sm:mt-5"
           style={{ width: MEDIUM_SIZE, height: MEDIUM_SIZE }}
         >
           <SynestheticBloom />
+          {falling && size > 0 && (
+            <div aria-hidden="true" className="changer-fall absolute inset-0 z-0 grid place-items-center">
+              <MediumObject era={falling} spinning={false} size={size} />
+            </div>
+          )}
           {size > 0 && (
-            <div className="record-pull relative z-10">
+            <div key={era} className={falling ? "changer-drop relative z-10" : "relative z-10"}>
               <a
                 href="#groove"
                 aria-hidden="true"
@@ -180,8 +205,6 @@ export function GrooveStage({
               </a>
             </div>
           )}
-          {/* the jacket — in front, covering the disc's right; slides away as you pull */}
-          {size > 0 && <div aria-hidden="true" className="record-jacket" />}
         </div>
 
         {/* era caption — updates as the world morphs through time */}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { PointerRoot } from "@/components/PointerRoot";
+import { StylusCursor } from "@/components/StylusCursor";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { NowPlayingOverlay } from "@/components/player/NowPlayingOverlay";
 import { SearchPalette } from "@/components/search/SearchPalette";
@@ -37,11 +38,14 @@ export function World({ children }: { children: ReactNode }) {
       <SearchPalette />
       <GrooveTransitionRoot />
 
-      {/* The pointer system: the NATIVE cursor, untouched — innovation lives in
-          the OBJECTS instead (gatefolds, sleeves, jukebox strips). The lamp
-          follows the hand, magnets lean in, [data-tilt] surfaces tilt toward
-          you. No-ops on coarse pointers / reduced motion. */}
+      {/* The pointer system (Phase 23): the cursor IS the stylus — a cartridge
+          needle that sits exactly on the pointer (zero lag), turns to face its
+          flight path, banks into corners, touches down on playables, and
+          trembles with the playing track's tempo. Beneath it: the lamp, the
+          magnets, the tilt surfaces. All no-op on coarse pointers / reduced
+          motion (native cursor stands). */}
       <PointerRoot />
+      <StylusCursor />
     </>
   );
 }
