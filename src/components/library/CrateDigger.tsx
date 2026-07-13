@@ -13,7 +13,7 @@
  * Perf: only a ±7 window of sleeves is mounted (~15 of 230+); transform/opacity
  * only; no wheel hijack — the page keeps native scroll.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { catalogRepository, decadeToEraId, releaseId, type Track } from "@/lib/catalog";
 import { getEra } from "@/lib/eras";
 import { RecordArt } from "@/components/art";
@@ -28,6 +28,12 @@ const WINDOW = 7; // sleeves mounted either side of the focus
 const ALL: Track[] = [...catalogRepository.allTracks()].sort(
   (a, b) => a.year - b.year || a.title.latin.localeCompare(b.title.latin),
 );
+
+/* A sleeve's art is deterministic per track — memoized so stepping the crate
+ * re-renders only the sleeves whose position changed, not all 15 SVGs. */
+const SleeveArt = memo(function SleeveArt({ track }: { track: Track }) {
+  return <RecordArt subject={{ track }} variant="sleeve" decorativeTitle />;
+});
 
 export function CrateDigger() {
   const reduced = useReducedMotion();
@@ -73,12 +79,6 @@ export function CrateDigger() {
     return ALL.slice(from, to).map((t, i) => ({ track: t, index: from + i }));
   }, [focus]);
 
-  // the crate follows the record's own era (palette morphs as you dig decades)
-  useEffect(() => {
-    if (!current) return;
-    // passive palette hint only — the era store stays owned by the world/scroll
-  }, [current]);
-
   if (!current) return null;
   const era = getEra(decadeToEraId(current.era));
   const albumId = current.film ? releaseId(current.film, current.year) : null;
@@ -123,22 +123,23 @@ export function CrateDigger() {
                 aria-label={`${track.title.latin} (${track.year})`}
                 tabIndex={-1}
                 onClick={() => setFocus(index)}
+                data-tilt={focused ? "" : undefined}
                 className={cx("crate__sleeve", focused && "crate__sleeve--front")}
                 style={
                   reduced
                     ? { opacity: focused ? 1 : 0, pointerEvents: focused ? "auto" : "none" }
                     : {
-                        transform: `translate(-50%, -50%) translateX(${
-                          off === 0 ? 0 : Math.sign(off) * 120 + off * 34
-                        }px) rotateY(${off === 0 ? 0 : -Math.sign(off) * 52}deg) scale(${
-                          focused ? 1 : 0.82
-                        })`,
+                        transform: focused
+                          ? `translate(-50%, -50%) perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))`
+                          : `translate(-50%, -50%) translateX(${
+                              Math.sign(off) * 120 + off * 34
+                            }px) rotateY(${-Math.sign(off) * 52}deg) scale(0.82)`,
                         zIndex: 100 - Math.abs(off),
                         opacity: Math.abs(off) >= WINDOW ? 0 : 1,
                       }
                 }
               >
-                <RecordArt subject={{ track }} variant="sleeve" decorativeTitle />
+                <SleeveArt track={track} />
               </button>
             );
           })}

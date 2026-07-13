@@ -146,7 +146,8 @@ export function TouchRecord({
     <div
       ref={rootRef}
       onClickCapture={onClickCapture}
-      className="touch-record"
+      data-tilt
+      className="touch-record tilt-card"
       style={{ touchAction: "pan-y" }}
     >
       {children}

@@ -15,6 +15,7 @@ export const GROOVE_UNIFORMS = [
   "uRes",
   "uTime",
   "uPointer",
+  "uVel",
   "uGlow",
   "uAccent",
   "uAccent2",
@@ -33,6 +34,7 @@ precision highp float;
 uniform vec2  uRes;      // drawing-buffer px
 uniform float uTime;     // seconds
 uniform vec2  uPointer;  // buffer px, y-up
+uniform vec2  uVel;      // smoothed pointer velocity (buffer px/frame, y-up)
 uniform vec3  uGlow;
 uniform vec3  uAccent;
 uniform vec3  uAccent2;
@@ -73,6 +75,9 @@ void main() {
       (sx + sin(uTime * 0.06 + i * 1.7) * 0.015) * uRes.x,
       mod(sy * uRes.y + uTime * speed, uRes.y)
     );
+    // the wake: your movement stirs the dust — motes near the hand are dragged
+    // along the pointer's velocity and swirl back as you slow
+    pos += uVel * 16.0 * exp(-distance(pos, uPointer) / (lampR * 0.55));
     float pd = distance(uv, pos);
     float size = (1.0 + sy * 1.6) * (uRes.y / 900.0 + 0.6);
     float mote = exp(-(pd * pd) / (size * size * 4.0));

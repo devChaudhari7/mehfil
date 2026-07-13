@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { GrainOverlay } from "@/components/GrainOverlay";
-import { NeedleCursor } from "@/components/NeedleCursor";
 import { PointerRoot } from "@/components/PointerRoot";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { NowPlayingOverlay } from "@/components/player/NowPlayingOverlay";
@@ -38,10 +37,11 @@ export function World({ children }: { children: ReactNode }) {
       <SearchPalette />
       <GrooveTransitionRoot />
 
-      {/* Phase 15 pointer system: lamp vars + magnets (PointerRoot) + the stylus
-          cursor. Both no-op on coarse pointers / reduced motion. */}
+      {/* The pointer system: NO drawn cursor — the native arrow stays (instant,
+          honest). Presence is expressed by the WORLD reacting: the light follows
+          the hand (lamp/GL), magnets lean in, [data-tilt] surfaces tilt toward
+          you. No-ops on coarse pointers / reduced motion. */}
       <PointerRoot />
-      <NeedleCursor />
     </>
   );
 }

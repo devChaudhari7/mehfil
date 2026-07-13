@@ -82,6 +82,7 @@ export function Gatefold({
           aria-label={open ? "Close the gatefold" : `Open the gatefold — ${release.film}`}
           onClick={() => setOpen((o) => !o)}
           data-magnet
+          data-tilt
           className="gatefold__cover"
         >
           <span className="gatefold__face gatefold__face--front">
