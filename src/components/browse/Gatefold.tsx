@@ -18,6 +18,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Release, Track } from "@/lib/catalog";
 import { usePlayerStore } from "@/lib/player/usePlayerStore";
+import { playCassetteClunk } from "@/lib/sound/sfx";
+import { useSoundStore } from "@/lib/sound/useSoundStore";
 import { RecordArt } from "@/components/art";
 import { Vinyl } from "@/components/ui";
 import { cx } from "@/lib/cx";
@@ -80,7 +82,11 @@ export function Gatefold({
           type="button"
           aria-expanded={open}
           aria-label={open ? "Close the gatefold" : `Open the gatefold — ${release.film}`}
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => {
+            useSoundStore.getState().unlock(); // the open IS a gesture
+            if (!open) playCassetteClunk(); // the jacket thunk
+            setOpen((o) => !o);
+          }}
           data-magnet
           data-tilt
           className="gatefold__cover"

@@ -195,6 +195,21 @@ export function buildEnterGroove(): string {
   return samplesToWavDataUri(s);
 }
 
+/** Card flick (Phase 24): the riffle of digging a crate — a 20ms padded thump. */
+export function buildCardFlick(): string {
+  const dur = 0.022;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    const env = Math.exp(-t * 320);
+    s[i] = clamp(
+      (Math.random() * 2 - 1) * 0.32 * env + Math.sin(2 * Math.PI * 610 * t) * 0.28 * env,
+    );
+  }
+  return samplesToWavDataUri(s);
+}
+
 /** Hover tick (Phase 21): a 12ms stylus click as the lathe finds something playable.
  *  Whisper-quiet, heavily throttled — texture, not notification. */
 export function buildHoverTick(): string {
@@ -287,6 +302,9 @@ let lastSweepAt = 0;
 let tickUri: string | null = null;
 let tick: Howl | null = null;
 let lastTickAt = 0;
+let flickUri: string | null = null;
+let flick: Howl | null = null;
+let lastFlickAt = 0;
 const bedHowls: Partial<Record<AmbienceKind, Howl>> = {};
 let currentBed: AmbienceKind | null = null;
 let unlocked = false;
@@ -349,6 +367,21 @@ export function playEnterGroove(): void {
   try {
     ensureEnter();
     enter?.play();
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** The crate riffle — one padded card-flick per dig step, throttled for scrubs. */
+export function playCardFlick(): void {
+  if (!unlocked || muted) return;
+  const now = Date.now();
+  if (now - lastFlickAt < 65) return;
+  lastFlickAt = now;
+  try {
+    flickUri ??= buildCardFlick();
+    flick ??= new Howl({ src: [flickUri], format: ["wav"], volume: 0.16 });
+    flick.play();
   } catch {
     /* non-fatal */
   }

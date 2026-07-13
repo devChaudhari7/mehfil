@@ -651,6 +651,21 @@ html[data-era-flash="20s"] .era-flash {
 .tuner--locked .tuner__readout {
   color: var(--accent);
 }
+/* the dial finds a year: the readout snaps in like a station locking */
+@keyframes tuner-lock {
+  from {
+    opacity: 0.3;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.tuner__lock {
+  display: inline-block;
+  animation: tuner-lock 0.26s var(--ease-analog) both;
+}
 .tuner__leds {
   display: flex;
   gap: 5px;

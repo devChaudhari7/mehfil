@@ -52,7 +52,10 @@ export function TunerStrip({ results, query }: { results: GroupedResults; query:
       </div>
 
       <div className="tuner__readout">
-        <span className="font-mono text-[10px] tracking-[0.22em] uppercase tabular-nums">
+        <span
+          key={active && avg !== null ? Math.round(avg) : -1}
+          className="tuner__lock font-mono text-[10px] tracking-[0.22em] uppercase tabular-nums"
+        >
           {active && avg !== null ? `tuned · ${Math.round(avg)}` : "tune the century"}
         </span>
         <span className="tuner__leds">

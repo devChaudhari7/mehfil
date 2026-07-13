@@ -13,13 +13,14 @@
  * Perf: only a ±7 window of sleeves is mounted (~15 of 230+); transform/opacity
  * only; no wheel hijack — the page keeps native scroll.
  */
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { catalogRepository, decadeToEraId, releaseId, type Track } from "@/lib/catalog";
 import { getEra } from "@/lib/eras";
 import { RecordArt } from "@/components/art";
 import { GrooveLink } from "@/components/GrooveLink";
 import { NativeText } from "@/components/ui";
 import { PlayControl } from "@/components/browse/PlayControl";
+import { playCardFlick } from "@/lib/sound/sfx";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { cx } from "@/lib/cx";
 
@@ -38,6 +39,16 @@ const SleeveArt = memo(function SleeveArt({ track }: { track: Track }) {
 export function CrateDigger() {
   const reduced = useReducedMotion();
   const [focus, setFocus] = useState(0);
+
+  // the riffle: every dig step flicks a card (post-gesture, throttled in sfx)
+  const firstFocus = useRef(true);
+  useEffect(() => {
+    if (firstFocus.current) {
+      firstFocus.current = false;
+      return;
+    }
+    playCardFlick();
+  }, [focus]);
   const clamp = useCallback((i: number) => Math.min(Math.max(i, 0), ALL.length - 1), []);
   const step = useCallback((d: number) => setFocus((f) => clamp(f + d)), [clamp]);
 
@@ -130,7 +141,7 @@ export function CrateDigger() {
                     ? { opacity: focused ? 1 : 0, pointerEvents: focused ? "auto" : "none" }
                     : {
                         transform: focused
-                          ? `translate(-50%, -50%) perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))`
+                          ? `translate(-50%, -50%) perspective(900px) rotateX(calc(5deg + var(--tilt-x, 0deg))) rotateY(var(--tilt-y, 0deg))`
                           : `translate(-50%, -50%) translateX(${
                               Math.sign(off) * 120 + off * 34
                             }px) rotateY(${-Math.sign(off) * 52}deg) scale(0.82)`,

@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Pause, Play, SkipBack, SkipForward, X } from "lucide-react";
 import { MediumArtifact } from "@/components/groove/MediumArtifact";
+import { TouchRecord } from "@/components/groove/TouchRecord";
 import { SynestheticBloom } from "@/components/groove/SynestheticBloom";
 import { NativeText } from "@/components/ui";
 import { decadeToEraId } from "@/lib/catalog";
@@ -181,14 +182,17 @@ export function NowPlayingDeck({ onClose, backHref }: NowPlayingDeckProps) {
             className="relative grid aspect-square w-[min(82vw,50vh,440px)] shrink-0 place-items-center"
           >
             {size > 0 && (
-              <MediumArtifact
-                era={era}
-                spinning={playing && !reduced}
-                showNeedle={showNeedle}
-                animated={!reduced}
-                clock={clock}
-                size={size}
-              />
+              /* grab the playing record — spin it, scratch it (turntable physics) */
+              <TouchRecord medium={medium} spinning={playing && !reduced}>
+                <MediumArtifact
+                  era={era}
+                  spinning={playing && !reduced && medium === "cassette"}
+                  showNeedle={showNeedle}
+                  animated={!reduced}
+                  clock={clock}
+                  size={size}
+                />
+              </TouchRecord>
             )}
           </div>
 

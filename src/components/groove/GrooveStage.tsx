@@ -94,8 +94,10 @@ export function GrooveStage({
     if (prev === era) return;
     prevEraRef.current = era;
     if (reduced) return;
+    // off-stage (inside the grooves) the hero is hidden — skip the theater entirely
+    if (document.documentElement.dataset.groovePhase === "in") return;
     setFalling(prev);
-    if (document.documentElement.dataset.groovePhase !== "in") playCassetteClunk();
+    playCassetteClunk();
     const t = window.setTimeout(() => setFalling(null), 650);
     return () => window.clearTimeout(t);
   }, [era, reduced]);

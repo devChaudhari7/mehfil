@@ -72,8 +72,12 @@ export function StylusCursor() {
       wake();
     };
     const onOver = (e: PointerEvent) => {
+      const target = e.target as Element | null;
+      // text fields keep the native caret — the stylus steps aside entirely
+      const overText = Boolean(target?.closest?.("input:not([type='range']),textarea,select"));
+      rootEl.style.opacity = overText || !shown ? "0" : "1";
       const was = overPlayable;
-      overPlayable = Boolean((e.target as Element | null)?.closest?.(INTERACTIVE));
+      overPlayable = !overText && Boolean(target?.closest?.(INTERACTIVE));
       if (overPlayable && !was) playHoverTick();
       rootEl.dataset.landed = overPlayable ? "1" : "";
       wake();
