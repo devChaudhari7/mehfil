@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CursorLathe } from "@/components/CursorLathe";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { PointerRoot } from "@/components/PointerRoot";
 import { PlayerBar } from "@/components/player/PlayerBar";
@@ -37,11 +38,15 @@ export function World({ children }: { children: ReactNode }) {
       <SearchPalette />
       <GrooveTransitionRoot />
 
-      {/* The pointer system: NO drawn cursor — the native arrow stays (instant,
-          honest). Presence is expressed by the WORLD reacting: the light follows
-          the hand (lamp/GL), magnets lean in, [data-tilt] surfaces tilt toward
-          you. No-ops on coarse pointers / reduced motion. */}
+      {/* The pointer system (Phase 21 "Cutting Lathe"): the NATIVE arrow stays
+          (instant, honest), and the cursor's identity is what it leaves behind —
+          your path is cut as a healing groove of era-light (CursorLathe), the
+          groove coils around anything playable, clicks ripple like needle drops.
+          Beneath it: the lamp follows the hand, magnets lean in, [data-tilt]
+          surfaces tilt toward you. All of it no-ops on coarse pointers and
+          reduced motion. */}
       <PointerRoot />
+      <CursorLathe />
     </>
   );
 }

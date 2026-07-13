@@ -195,6 +195,22 @@ export function buildEnterGroove(): string {
   return samplesToWavDataUri(s);
 }
 
+/** Hover tick (Phase 21): a 12ms stylus click as the lathe finds something playable.
+ *  Whisper-quiet, heavily throttled — texture, not notification. */
+export function buildHoverTick(): string {
+  const dur = 0.014;
+  const n = Math.floor(SAMPLE_RATE * dur);
+  const s = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SAMPLE_RATE;
+    const env = Math.exp(-t * 600);
+    s[i] = clamp(
+      Math.sin(2 * Math.PI * 2600 * t) * 0.5 * env + (Math.random() * 2 - 1) * 0.08 * env,
+    );
+  }
+  return samplesToWavDataUri(s);
+}
+
 /** Radio-tuning sweep (Phase 15.6): crossing a decade sounds like sweeping the dial —
  *  a falling whistle through static, then the station catches with a soft blip. */
 export function buildTuningSweep(): string {
@@ -268,6 +284,9 @@ let enter: Howl | null = null;
 let veil: Howl | null = null;
 let sweep: Howl | null = null;
 let lastSweepAt = 0;
+let tickUri: string | null = null;
+let tick: Howl | null = null;
+let lastTickAt = 0;
 const bedHowls: Partial<Record<AmbienceKind, Howl>> = {};
 let currentBed: AmbienceKind | null = null;
 let unlocked = false;
@@ -330,6 +349,21 @@ export function playEnterGroove(): void {
   try {
     ensureEnter();
     enter?.play();
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Stylus tick on hovering something playable — quiet, throttled texture. */
+export function playHoverTick(): void {
+  if (!unlocked || muted) return;
+  const now = Date.now();
+  if (now - lastTickAt < 120) return;
+  lastTickAt = now;
+  try {
+    tickUri ??= buildHoverTick();
+    tick ??= new Howl({ src: [tickUri], format: ["wav"], volume: 0.12 });
+    tick.play();
   } catch {
     /* non-fatal */
   }

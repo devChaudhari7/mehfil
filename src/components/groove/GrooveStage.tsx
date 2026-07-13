@@ -183,7 +183,9 @@ export function GrooveStage({
           data-intro
           className="text-ink/55 mt-4 font-mono text-[11px] tracking-[0.22em] uppercase tabular-nums"
         >
-          {cfg.decade} · {cfg.mediumLabel}
+          <span key={era} className="caption-flip inline-block">
+            {cfg.decade} · {cfg.mediumLabel}
+          </span>
         </p>
 
         <div data-intro className="mt-5">

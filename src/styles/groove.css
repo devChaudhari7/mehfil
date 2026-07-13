@@ -461,6 +461,23 @@ html[data-era-flash="20s"] .era-flash {
  * PointerRoot writes --tilt-x/--tilt-y (lerped) on [data-tilt] elements;
  * each surface folds the vars into its own transform.
  * ------------------------------------------------------------------ */
+/* the era caption flips like a split-flap line when time changes */
+@keyframes caption-flip {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.caption-flip {
+  animation: caption-flip var(--dur-3) var(--ease-analog) both;
+}
+
 .tilt-card {
   transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
   transform-style: preserve-3d;

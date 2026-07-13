@@ -61,7 +61,8 @@ export function RetroWall({ releases, tracks }: { releases: Release[]; tracks: T
                 href={`/album/${item.release.id}`}
                 intent="journey"
                 aria-label={`${item.release.film}, ${item.year}`}
-                className="block h-24 w-24 overflow-hidden rounded-[5px] shadow-[0_14px_34px_rgba(0,0,0,0.5)] transition-transform duration-[var(--dur-2)] ease-[var(--ease-out)] hover:-translate-y-1"
+                data-tilt
+                className="tilt-card block h-24 w-24 overflow-hidden rounded-[5px] shadow-[0_14px_34px_rgba(0,0,0,0.5)] transition-transform duration-[var(--dur-2)] ease-[var(--ease-out)] hover:-translate-y-1"
               >
                 <RecordArt subject={{ release: item.release }} variant="sleeve" decorativeTitle />
               </GrooveLink>
