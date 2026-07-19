@@ -4,12 +4,11 @@ import {
   catalogRepository,
   decadeToEraId,
   ERA_DECADES,
-  filmReleases,
   type EraDecade,
 } from "@/lib/catalog";
 import { getEra } from "@/lib/eras";
 import { Heading, Mono } from "@/components/ui";
-import { BrowseShell, EraDial, RecordGrid, ReleaseCard, SetEra } from "@/components/browse";
+import { BrowseCollection, BrowseShell, EraDial, SetEra } from "@/components/browse";
 
 /*
  * /era/[decade] — the era zone. The dial tunes between decades; selecting one
@@ -40,8 +39,7 @@ export default async function EraPage({ params }: { params: Promise<{ decade: st
 
   const eraId = decadeToEraId(decade);
   const cfg = getEra(eraId);
-  const tracks = catalogRepository.tracksByEra(decade);
-  const releases = filmReleases(tracks);
+  const trackCount = catalogRepository.tracksByEra(decade).length;
 
   return (
     <>
@@ -56,7 +54,7 @@ export default async function EraPage({ params }: { params: Promise<{ decade: st
               The {decade}
             </Heading>
             <p className="text-ink/70 mt-3 font-body">
-              {tracks.length} records · {cfg.soundTexture}. Turn the dial to travel the eras.
+              {trackCount} records · {cfg.soundTexture}. Turn the dial to travel the eras.
             </p>
           </>
         }
@@ -65,21 +63,7 @@ export default async function EraPage({ params }: { params: Promise<{ decade: st
           <EraDial />
         </section>
 
-        {releases.length > 0 && (
-          <section aria-label="Films in this era">
-            <Heading level={2}>Films</Heading>
-            <div className="stagger-grid mt-6 flex flex-wrap justify-center gap-6">
-              {releases.map((r) => (
-                <ReleaseCard key={r.id} release={r} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section aria-label="Records">
-          <Heading level={2}>Records</Heading>
-          <RecordGrid tracks={tracks} label={`${decade} records`} className="mt-8" />
-        </section>
+        <BrowseCollection source={{ kind: "era", value: decade }} recordLabel={`${decade} records`} />
       </BrowseShell>
     </>
   );

@@ -8,12 +8,11 @@ import {
   LANGUAGES,
   REGIONS,
 } from "@/lib/catalog";
-import { Heading, Mono, NativeText } from "@/components/ui";
+import { Heading, Mono } from "@/components/ui";
 import { BrowseShell } from "@/components/browse";
-import { RecordArt } from "@/components/art";
 import { GrooveLink } from "@/components/GrooveLink";
-import { CatalogPlayButton } from "@/components/player/CatalogPlayButton";
 import { CrateDigger } from "@/components/library/CrateDigger";
+import { PressingSheet } from "@/components/library/PressingSheet";
 
 /*
  * /catalog — "The Library": the accessible, list-mode browse hub (the "Browse as
@@ -100,53 +99,7 @@ export default function LibraryPage() {
         ))}
       </FacetRow>
 
-      <section aria-label="All records">
-        <Heading level={2}>The pressing sheet ({tracks.length})</Heading>
-        <div className="mt-5 overflow-x-auto rounded-2xl border border-white/10">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th scope="col" className="px-4 py-3">
-                  <span className="sr-only">Sleeve</span>
-                </th>
-                {["Play", "Title", "Era", "Language", "Region"].map((h) => (
-                  <th key={h} scope="col" className="px-4 py-3">
-                    <Mono className="text-ink/60">{h}</Mono>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {tracks.map((t) => (
-                <tr
-                  key={t.id}
-                  className="border-b border-white/5 align-top transition-colors duration-[var(--dur-1)] ease-[var(--ease-out)] last:border-0 hover:bg-white/[0.03]"
-                >
-                  <td className="px-4 py-3">
-                    <span className="block h-10 w-10 overflow-hidden rounded-[3px] shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
-                      <RecordArt subject={{ track: t }} size="sm" variant="swatch" />
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <CatalogPlayButton trackId={t.id} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <NativeText
-                      native={t.title.native}
-                      latin={t.title.latin}
-                      script={t.script}
-                      size="body"
-                    />
-                  </td>
-                  <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.era}</td>
-                  <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.language}</td>
-                  <td className="text-ink/80 px-4 py-3 font-mono text-sm">{t.region}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <PressingSheet />
     </BrowseShell>
   );
 }

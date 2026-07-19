@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   catalogRepository,
-  filmReleases,
   LANGUAGES,
   representativeEra,
   type Language,
 } from "@/lib/catalog";
 import { Heading, Mono } from "@/components/ui";
-import { BrowseShell, RecordGrid, ReleaseCard, SetEra } from "@/components/browse";
+import { BrowseCollection, BrowseShell, SetEra } from "@/components/browse";
 
 /*
  * /language/[lang] — browse by language (Hindi · Punjabi · Bengali · English).
@@ -43,8 +42,8 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
   const { lang } = await params;
   if (!isLanguage(lang)) notFound();
 
+  // server-only: pick the zone era + count; the lists render client-side (windowed)
   const tracks = catalogRepository.tracksByLanguage(lang);
-  const releases = filmReleases(tracks);
 
   return (
     <>
@@ -62,21 +61,10 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
           </>
         }
       >
-        {releases.length > 0 && (
-          <section aria-label="Films">
-            <Heading level={2}>Films</Heading>
-            <div className="stagger-grid mt-6 flex flex-wrap justify-center gap-6">
-              {releases.map((r) => (
-                <ReleaseCard key={r.id} release={r} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section aria-label="Records">
-          <Heading level={2}>Records</Heading>
-          <RecordGrid tracks={tracks} label={`${LABEL[lang]} records`} className="mt-8" />
-        </section>
+        <BrowseCollection
+          source={{ kind: "language", value: lang }}
+          recordLabel={`${LABEL[lang]} records`}
+        />
       </BrowseShell>
     </>
   );

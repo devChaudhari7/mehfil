@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   catalogRepository,
-  filmReleases,
   REGIONS,
   representativeEra,
   type Region,
 } from "@/lib/catalog";
 import { Heading, Mono } from "@/components/ui";
-import { BrowseShell, RecordGrid, ReleaseCard, SetEra } from "@/components/browse";
+import { BrowseCollection, BrowseShell, SetEra } from "@/components/browse";
 
 /*
  * /region/[region] — browse by region (India · the West). Zone palette settles on
@@ -40,8 +39,8 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
   const { region } = await params;
   if (!isRegion(region)) notFound();
 
+  // server-only: pick the zone era + count; the lists render client-side (windowed)
   const tracks = catalogRepository.tracksByRegion(region);
-  const releases = filmReleases(tracks);
 
   return (
     <>
@@ -57,21 +56,10 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
           </>
         }
       >
-        {releases.length > 0 && (
-          <section aria-label="Films">
-            <Heading level={2}>Films</Heading>
-            <div className="stagger-grid mt-6 flex flex-wrap justify-center gap-6">
-              {releases.map((r) => (
-                <ReleaseCard key={r.id} release={r} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section aria-label="Records">
-          <Heading level={2}>Records</Heading>
-          <RecordGrid tracks={tracks} label={`${LABEL[region]} records`} className="mt-8" />
-        </section>
+        <BrowseCollection
+          source={{ kind: "region", value: region }}
+          recordLabel={`${LABEL[region]} records`}
+        />
       </BrowseShell>
     </>
   );

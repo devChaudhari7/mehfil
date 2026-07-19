@@ -1,3 +1,4 @@
+export { BrowseCollection } from "./BrowseCollection";
 /* MEHFIL — Phase 5 browse components. */
 export { BrowseShell } from "./BrowseShell";
 export { SetEra } from "./SetEra";
